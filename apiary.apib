@@ -1,4 +1,279 @@
 FORMAT: 1A
-HOST: http://polls.apiblueprint.org/
+HOST: https://api.zonky.cz/
 
-# Zonky API
+# Zonky REST API
+
+The Zonky REST API provides programmatic access to Zonky data in JSON format. 
+
+We know that API exposed on _api.zonky.cz_ endpoint is public, but please be aware that the part of the API
+documented here is a subset of our API we ourselves consider _public_. We expect someone else may use this API and therefore we 
+try to keep it backward compatible or at least let you know about upcoming changes in advance. 
+We may not gurantee anything since the API is primarily used by Zonky itself, but you have our promise we will do our best to not break your work.
+
+# Rules of thumb
+
+## Let us know
+
+Please let us know you're building something on top of our API. Just drop an e-mail to [admin@zonky.cz](mailto:admin@zonky.cz). Why?
+We can promote your application to thousands of customers, let you know in advance about upcoming changes or just to know about you.
+
+## Use User-Agent
+
+Every HTTP client should send the User-Agent header according to [HTTP/1.1 semantics and content](https://tools.ietf.org/html/rfc7231#section-5.5.3). 
+The header should contain application, version and contact information (URL).
+
+* the User-Agent pattern: ```${application}/${version} (${url})```
+* the User-Agent example: ```Foo/1.0 (https://github.com/john.doe/foo)```
+
+The User-Agent header helps us in many areas. We may use this header to analyze API changes impact and so on.
+
+## Secure access
+Beware, the dark side is listening. Use secure transport protocol (HTTPS) when accessing Zonky.
+
+## User credentials
+It's prohibited to ask for credentials (username, password) of other users. It's a security issue and a violation of the 
+[Zonky terms & conditions](https://zonky.cz/downloads/Zonky_Pravidla_portalu.pdf).
+
+## API Quota, limits, rate limiting, QoS
+And other ugly words may follow. Please take into account that even our system has limits. Do to this API as you would have others to do to your own API. The Force awakens...
+
+## Bugs and improvements
+If you find any bug in our API please use [admin@zonky.cz](mailto:admin@zonky.cz). Feel free to ask questions or propose improvements regarding the API via [Zonky API GitHub project](https://github.com/zonkyio/zonky-api) or [admin@zonky.cz](mailto:admin@zonky.cz).
+
+
+# API Versions and changes
+
+## 0.19.0
+First version available for public audience.
+
+# OAuth 2 authentication
+
+Zonky users are identified using [OAuth 2.0](http://oauth.net/2/) protocol. At the moment we support only OAuth 2 
+[Resource Owner Password Credentials grant flow](https://tools.ietf.org/html/rfc6749#section-4.3) where user receives an access token and
+a refresh token in exchange for their username and password. 
+
+**Acting** on **behalf** of other **users** by supplying their **credentials** is strictly **prohibited**. Applications violating this rule will be banned with no mercy. We may eventually extend our implemenation with [Authorization Code Grant flow](https://tools.ietf.org/html/rfc6749#section-4.1) allowing  3rd party applications to act on behalf of a registered user.
+
+## Access token and refresh token
+To keep things as secure as possible you have to pay attention to the right usage of OAuth authentication protocol. The right way is to obtain 
+an access token and a refresh token with user's credentials *on the first authentication request*. Retrieved access token has limited validity (advertised in the
+response). After its expiration you should retrieve a new one with a refresh token which has longer validity.
+
+# Pagination, sorting and filtering
+All listing resources in this API stick to the same conventions of how to paginate, sort and filter data.
+
+## Pagination
+You can query for a subset of data provided by a resource using ```X-Page``` and ```X-Size``` headers. Numbering starts with ```0``` and reasonable defaults are set for cases when 
+no headers are present in the request. 
+
+Total number of records is indicated in the response with ```X-Total``` header.
+
+For example if you query a resource with a total of 40 records with headers ```X-Page: 0``` and ```X-Size: 20``` the API will return records ```0-19``` 
+and ```X-Total: 40``` header value.
+
+## Sorting
+You can sort output data by setting ```X-Order``` header in the request. As a value use list of field names separated by a comma ```,```. 
+Putting ```-``` before the field name indicates descending order.
+
+For example:
+
++ ```X-Order: -interestRate,termInMonths``` retrieves list of loans with highest interest rate and shortest term on top
+
+## Filtering
+Resource records can be filtered by providing query parameters matching the following pattern: ```${fieldName}__${operationSuffix}=${filterValue}```.
+
+| Operation suffix        | Description           | Examples  |
+| :------------- |:-------------                                                                        |:-----|
+|  contains     | Retrieves object with property containing provided value (case-sensitive)             | ```?name__contains=foo``` |
+|  icontains    | Retrieves object with property containing provided value (case-insensitive)           | ```?name__icontains=foo``` |
+|  startswith   | Retrieves object with property starting with provided value (case-sensitive)          | ```?name__startswith=foo``` |
+|  istartswith  | Retrieves object with property starting with provided value (case-insensitive)        | ```?name__istartswith=foo``` |
+|  endswith      | Retrieves object with property ending with provided value (case-sensitive)            | ```?name__endswith=foo``` |
+|  iendswith     | Retrieves object with property ending with provided value (case-insensitive)          | ```?name__iendswith=foo```  |
+|  in           | Retrieves object if property is contained in provided list of values (case-sensitive) | ```?rating__in=["AAA","AA"]``` |
+|  eq           | Retrieves object if property equals to provided value (case-sensitive)                | ```?rating__eq=A``` |
+|  noteq        | Retrieves object if property not equals to provided value (case-sensitive)            | ```?rating__noteq=A``` |
+|  gt           | Retrieves object if property is greater than provided value                           | ```termInMonths__gt=24``` |
+|  gte          | Retrieves object if property is greater or equal to provided value                    | ```termInMonths__gte=24``` |
+|  lt           | Retrieves object if property is less than provided value                              | ```termInMonths__lt=24``` |
+|  lte          | Retrieves object if property is less or equal to provided value                       | ```termInMonths__lte=24``` |
+|  containsall  | Retrieves object if property is collection of simple values (string, number) and contains all values in the provided list | ```listField__containsall=["value1","value2"]``` |
+|  containsany  | Retrieves object if property is collection of simple values (string, number) and contains any value from the provided list | ```listField__containsany=["value1","value2"]``` |
+
+## Data types
+When filtering with ```gt```, ```gte```, ```lt```, ```lte``` it is possible to use date or datetime data type in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format, 
+for example ```datePublished__gt=2014-08-20T23:59:59.000Z``` or ```datePublished__lt=2014-12-31TZ```.
+
+
+## Sorting and filtering restrictions
+Not all fields are available for sorting and filtering. In such cases you will be informed that your action is not allowed with a response ```400 Bad Request```
+and details in the response body:
+
+```
+{
+  "error" : "invalid_filter",
+  "error_description" : "Filter or ordering property not allowed: amount",
+  "uuid" : "25f1f568-e8d1-4066-97a3-110e679dd6ee",
+  "property" : "amount",
+  "operation" : "X-Order"
+}
+```
+
+
+# Group OAuth
+
+## Token [/oauth/token]
+
+Token authentication endpoint.
+
++ Model (application/json)
+
+    ```js
+    {
+        "access_token" : "c5f6b996-47aa-4c59-8fc7-8a03fcf5da9d",
+        "token_type" : "bearer",
+        "refresh_token" : "d33c18a7-cc94-4e35-9ac3-c67528a602f4",
+        "expires_in" : 299,
+        "scope" : "SCOPE_APP_WEB"
+    }
+    ```
+
+### Get access token [POST]
+
++ Request Authenticate a user with their credentials (application/x-www-form-urlencoded)
+
+    + Headers
+
+            Authorization: Basic d2ViOndlYg==
+
+    + Body
+
+            username=test&password=test&grant_type=password&scope=SCOPE_APP_WEB
+
++ Response 200
+
+    [Token][]
+    
++ Request Renew the access token with the refresh token (application/x-www-form-urlencoded)
+
+    + Headers
+
+            Authorization: Basic d2ViOndlYg==
+
+    + Body
+
+            refresh_token=d33c18a7-cc94-4e35-9ac3-c67528a602f4&grant_type=refresh_token&scope=SCOPE_APP_WEB
+
++ Response 200
+
+    [Token][]
+    
+    
+# Group Marketplace
+    
+## Marketplace [/loans/marketplace]
+
+Overview of loans on the marketplace.
+
++ Model (application/json)
+
+    ```js
+    [
+        {
+          "id" : 1,
+          "name" : "Loan refinancing",
+          "story" : "Dear investors, ...",
+          "purpose" : "6",
+          "photos" : [ {
+                    "name" : "6",
+                    "url" : "/loans/31959/photos/1987"
+                } ],
+          "nickName" : "zonky0",
+          "termInMonths" : 42,
+          "interestRate" : 0.059900,
+          "rating" : "AAA",
+          "topped" : null,
+          "amount" : 200000.00,
+          "remainingInvestment" : 152600.00,
+          "investmentRate" : 0.237,
+          "covered" : false,
+          "datePublished" : "2016-04-19T18:25:41.208+02:00",
+          "published" : true,
+          "deadline" : "2016-04-26T18:23:53.101+02:00",
+          "investmentsCount" : 72,
+          "questionsCount" : 3,
+          "region" : "6",
+          "mainIncomeType" : "EMPLOYMENT"
+        }
+    ]
+    ```
+
+### GET
+
+Get loans on marketplace.
+
+Available sorting and filtering fields:
+
+| Field        | Sorting           | Filtering  |
+| :------------- |:-------------:|:-----:|
+|```datePublished```| YES| YES |
+|```interestRate```| YES| YES |
+|```covered```| YES| YES |
+|```termInMonths```| YES| YES |
+|```purpose```| YES| YES |
+|```rating```| YES| YES |
+|```incomes```| YES| YES |
+|```topped```| YES| YES |
+|```remainingInvestment```| YES| YES |
+
++ Response 200
+
+    [Marketplace][]
+    
+    
+## Loan [/loans/{id}]
+
+Single loan detail.
+
++ Parameters
+
+    + id: 1 (integer) - ID of a loan
+
++ Model (application/json)
+
+    ```js
+    {
+          "id" : 1,
+          "name" : "Loan refinancing",
+          "story" : "Dear investors, ...",
+          "purpose" : "6",
+          "photos" : [ {
+                    "name" : "6",
+                    "url" : "/loans/31959/photos/1987"
+                } ],
+          "nickName" : "zonky0",
+          "termInMonths" : 42,
+          "interestRate" : 0.059900,
+          "rating" : "AAA",
+          "topped" : null,
+          "amount" : 200000.00,
+          "remainingInvestment" : 152600.00,
+          "investmentRate" : 0.237,
+          "covered" : false,
+          "datePublished" : "2016-04-19T18:25:41.208+02:00",
+          "published" : true,
+          "deadline" : "2016-04-26T18:23:53.101+02:00",
+          "investmentsCount" : 72,
+          "questionsCount" : 3,
+          "region" : "6",
+          "mainIncomeType" : "EMPLOYMENT"
+    }
+    ```
+
+### GET
+
+Get loan detail.
+
++ Response 200
+
+    [Loan][]
