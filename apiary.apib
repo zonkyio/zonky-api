@@ -44,7 +44,10 @@ If you find any bug in our API please use [admin@zonky.cz](mailto:admin@zonky.cz
 # API Versions and changes
 
 ## 0.19.0
-First version available for public audience.
+* First version available for public audience.
+
+## 0.25.0
+* Investing endpoints reference.
 
 # OAuth 2 authentication
 
@@ -230,7 +233,6 @@ Available sorting and filtering fields:
 
     [Marketplace][]
     
-    
 ## Loan [/loans/{id}]
 
 Single loan detail.
@@ -277,3 +279,92 @@ Get loan detail.
 + Response 200
 
     [Loan][]
+    
+# Group Investing
+
+## Investment [/marketplace/investment]
+
+Make a new investment.
+    
+### POST
+
+#### reCAPTCHA authorization
+
+All investments that are made withing first 120 seconds after a loan publication on the marketplace 
+have to be authorized by [reCAPTCHA](https://www.google.com/recaptcha). 
+
+The time before investing opens for all requests without authorization may change anytime in the future.
+
++ Request
+
+    + Headers
+    
+            Content-Type: application/json
+            Authorization: Bearer 674e7f35-7aba-4cec-858c-f48861e9dc21
+        
+    + Body
+
+        ```js
+        {
+              "amount" : 200,
+              "loanId" : 1,
+              "captcha_response" : "..."
+        }
+        ```
+
++ Response 200
+
++ Response 400
+
+    Captcha verification is required
+
+    + Body
+
+        ```js
+        {
+              "error" : "CAPTCHA_REQUIRED",
+              "error_description" : "Captcha authorization is required."
+        }
+        ```
+    
++ Response 403
+
+    Captcha verification was unsuccessful
+
+    + Body
+    
+        ```js
+        {
+              "error" : "CAPTCHA_VERIFICATION_UNSUCCESSFUL",
+              "error_description" : "Captcha verification failed."
+        }
+        ```
+
+## Investment increase [/marketplace/investment/{investment}]
+
+Increase invested amount for an existing investment.
+
++ Parameters
+
+    + investment: 1 (integer) - ID of an investment
+    
+### PATCH
+
+Increase existing investment.
+
++ Request
+
+    + Headers
+    
+            Content-Type: application/json
+            Authorization: Bearer 674e7f35-7aba-4cec-858c-f48861e9dc21
+        
+    + Body
+
+        ```js
+        {
+              "amount" : 200
+        }
+        ```
+
++ Response 200
