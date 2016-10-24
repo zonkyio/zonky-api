@@ -49,6 +49,10 @@ If you find any bug in our API please use [admin@zonky.cz](mailto:admin@zonky.cz
 ## 0.25.0
 * Investing endpoints reference.
 
+## 0.29.0
+* Unified default ordering of loans on marketplace for authenticated and anonymous users. 
+
+
 # OAuth 2 authentication
 
 Zonky users are identified using [OAuth 2.0](http://oauth.net/2/) protocol. At the moment we support only OAuth 2 
@@ -104,8 +108,9 @@ Resource records can be filtered by providing query parameters matching the foll
 |  containsany  | Retrieves object if property is collection of simple values (string, number) and contains any value from the provided list | ```listField__containsany=["value1","value2"]``` |
 
 ## Data types
-When filtering with ```gt```, ```gte```, ```lt```, ```lte``` it is possible to use date or datetime data type in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format, 
-for example ```datePublished__gt=2014-08-20T23:59:59.000Z``` or ```datePublished__lt=2014-12-31TZ```.
+When filtering with ```gt```, ```gte```, ```lt```, ```lte``` it is possible to use ISO-8601 [date](https://docs.oracle.com/javase/8/docs/api/java/time/format/DateTimeFormatter.html#ISO_DATE) or [datetime](https://docs.oracle.com/javase/8/docs/api/java/time/format/DateTimeFormatter.html#ISO_OFFSET_DATE_TIME) data type in format, 
+for example ```datePublished__gt=2016-08-20T23:59:59.000+02:00``` or ```datePublished__lt=2016-08-20```. When no time zone offset is present in incoming data, API will use default platform time zone 
+(```Europe/Prague```) for parsing.
 
 
 ## Sorting and filtering restrictions
