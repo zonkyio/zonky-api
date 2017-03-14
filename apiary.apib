@@ -285,6 +285,56 @@ Get loan detail.
 
     [Loan][]
     
+    
+
+## Loan investments [/loans/{id}/investments]
+
+Investments of the loan selected by ID.
+
++ Parameters
+
+    + id: 1 (integer) - ID of a loan
+
++ Model (application/json)
+
+    ```js
+    [
+      {
+        "id": 123456,
+        "firstAmount": 200,
+        "amount": 200,
+        "timeCreated": "2017-01-10T15:10:40.831+01:00",
+        "investorId": 1234,
+        "loanId": 66655,
+        "investorNickname": "Bob",
+        "status": "ACTIVE",
+        "additionalAmount": 0
+      },
+      {
+        "id": 987654,
+        "firstAmount": 1000,
+        "amount": 1000,
+        "timeCreated": "2017-02-12T15:44:26.951+01:00",
+        "investorId": 5678,
+        "loanId": 77788,
+        "investorNickname": "Tom",
+        "status": "ACTIVE",
+        "additionalAmount": 0
+      }
+    ]
+
+    ```
+
+### GET
+
+Get all investmens for the loan.
+
++ Response 200
+
+    [Loan investments][]
+
+    
+    
 # Group Investing
 
 ## Investment [/marketplace/investment]
