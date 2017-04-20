@@ -441,12 +441,42 @@ Increase existing investment.
 
 # Group Notifications
 
-## Investment [/users/me/notifications]
+## User's notifications [/users/me/notifications]
 
-Get notifications.
+Get user's notifications. Opened notifications are marked as a read.
     
 ### GET
 
+Available types are:
+
+| Type        | Description |
+| :-------------- |:-------------- |
+|```NOOP```|Default type.|
+|```LOAN_APPLIED_NO_ACTIVATE```|Long-time application.|
+|```APPLICATION_APPROVE```|Application was approved.|
+|```APPLICATION_DOCUMENTS```|Documents required to approve an application.|
+|```APPLICATION_DOCUMENTS_SECOND```|Documents required to approve an application (second notification).|
+|```APPLICATION_AGREEMENT```|Print agreement sent to borrower.|
+|```APPLICATION_MARKETPLACE```|Application added to marketplace.|
+|```LOAN_PUBLISHED```|Loan was published.|
+|```LOAN_SEND_MONEY_BORROWER```|Loan is covered and money is being send. This was replaced by ```LOAN_COVERED```|
+|```LOAN_COVERED```|Loan was covered by investors.|
+|```LOAN_QUESTION_SAVE```|Question from chat.|
+|```LOAN_DELAY_BORROWER```|The borrower fell into delinquency.|
+|```LOAN_REPAYMENT_COMPLETED_BORROWER```|Successful repayment of the loan.|
+|```LOAN_DEADLINE_INSTALMENT```|The repayment term is approaching.|
+|```LOAN_DIFFERENT_LAST_INSTALMENT```|Different amounts of the last installment.|
+|```LOAN_PAYMENT_HALF```|Congratulations to repayment of half loan.|
+|```LOAN_ANSWER_SAVE```|The answer to your question.|
+|```LOAN_SUCCESS```|Trading of the investment.|
+|```LOAN_CANCEL```|Non-trading of investments.|
+|```LOAN_UNSIGNED```|To borrower: approved loan is still unsigned.|
+|```WALLET_INCOMING```|Adoption of the money in the wallet.|
+|```LOAN_PREPAYMENT```|Early repayment, extraordinary repayment.|
+|```LOAN_DELAY_INVESTOR```|Loan overdue.|
+|```BORROWER_HEAL```|The borrower has healed.|
+|```REQUEST_INVESTOR_WELCOME```|Investor applied.|
+|```INSTALMENT_PAID```|The instalment was paid.|
 
 + Request
 
