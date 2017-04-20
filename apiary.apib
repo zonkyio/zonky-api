@@ -436,3 +436,59 @@ Increase existing investment.
         ```
 
 + Response 200
+
+
+
+# Group Notifications
+
+## Investment [/users/me/notifications]
+
+Get notifications.
+    
+### GET
+
+
++ Request
+
+    + Headers
+    
+            Content-Type: application/json
+            Authorization: Bearer 674e7f35-7aba-4cec-858c-f48861e9dc21
+
+
++ Response 200
+
+    + Body
+    
+        ```js
+        [
+            {
+                "date":"2017-04-20T00:05:55.555+02:00",
+                "visited":false,
+                "text":"Opožděná splátka od Novák právě přistála ve vaší peněžence. ",
+                "link":
+                    {
+                        "type":"BORROWER_HEAL",
+                        "params":
+                            {
+                                "loanId":5555
+                            }
+                    },
+                "id":222222
+            },
+            {
+                "date":"2017-04-19T11:19:42.320+02:00"
+                "visited":false,
+                "text":"Opožděná splátka od zonky1234 právě přistála ve vaší peněžence. ",
+                "link":
+                    {
+                        "type":"BORROWER_HEAL",
+                        "params":
+                            {
+                                "loanId":66666
+                            }
+                    },
+                "id":333333
+            }
+        ]
+        ```
