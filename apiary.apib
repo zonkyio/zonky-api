@@ -50,7 +50,10 @@ If you find any bug in our API please use [admin@zonky.cz](mailto:admin@zonky.cz
 * Investing endpoints reference.
 
 ## 0.29.0
-* Unified default ordering of loans on marketplace for authenticated and anonymous users. 
+* Unified default ordering of loans on marketplace for authenticated and anonymous users.
+
+## 0.46.0
+* Updated documentation of the loan response.
 
 
 # OAuth 2 authentication
@@ -175,47 +178,13 @@ Token authentication endpoint.
 + Response 200
 
     [Token][]
-    
-    
+
+
 # Group Marketplace
     
 ## Marketplace [/loans/marketplace]
 
 Overview of loans on the marketplace.
-
-+ Model (application/json)
-
-    ```js
-    [
-        {
-          "id" : 1,
-          "url" : "https://app.zonky.cz/loan/1",
-          "name" : "Loan refinancing",
-          "story" : "Dear investors, ...",
-          "purpose" : "6",
-          "photos" : [ {
-                    "name" : "6",
-                    "url" : "/loans/31959/photos/1987"
-                } ],
-          "nickName" : "zonky0",
-          "termInMonths" : 42,
-          "interestRate" : 0.059900,
-          "rating" : "AAA",
-          "topped" : null,
-          "amount" : 200000.00,
-          "remainingInvestment" : 152600.00,
-          "investmentRate" : 0.237,
-          "covered" : false,
-          "datePublished" : "2016-04-19T18:25:41.208+02:00",
-          "published" : true,
-          "deadline" : "2016-04-26T18:23:53.101+02:00",
-          "investmentsCount" : 72,
-          "questionsCount" : 3,
-          "region" : "6",
-          "mainIncomeType" : "EMPLOYMENT"
-        }
-    ]
-    ```
 
 ### GET
 
@@ -235,10 +204,11 @@ Available sorting and filtering fields:
 |```topped```| YES| YES |
 |```remainingInvestment```| YES| YES |
 
-+ Response 200
++ Response 200 (application/json)
 
-    [Marketplace][]
+    + Attributes (array[Loan])
     
+
 ## Loan [/loans/{id}]
 
 Single loan detail.
@@ -247,46 +217,13 @@ Single loan detail.
 
     + id: 1 (integer) - ID of a loan
 
-+ Model (application/json)
-
-    ```js
-    {
-          "id" : 1,
-          "url" : "https://app.zonky.cz/loan/1",
-          "name" : "Loan refinancing",
-          "story" : "Dear investors, ...",
-          "purpose" : "6",
-          "photos" : [ {
-                    "name" : "6",
-                    "url" : "/loans/31959/photos/1987"
-                } ],
-          "nickName" : "zonky0",
-          "termInMonths" : 42,
-          "interestRate" : 0.059900,
-          "rating" : "AAA",
-          "topped" : null,
-          "amount" : 200000.00,
-          "remainingInvestment" : 152600.00,
-          "investmentRate" : 0.237,
-          "covered" : false,
-          "datePublished" : "2016-04-19T18:25:41.208+02:00",
-          "published" : true,
-          "deadline" : "2016-04-26T18:23:53.101+02:00",
-          "investmentsCount" : 72,
-          "questionsCount" : 3,
-          "region" : "6",
-          "mainIncomeType" : "EMPLOYMENT"
-    }
-    ```
-
 ### GET
 
 Get loan detail.
 
-+ Response 200
++ Response 200 (application/json)
 
-    [Loan][]
-    
+    + Attributes (Loan)
     
 
 ## Loan investments [/loans/{id}/investments]
@@ -524,3 +461,47 @@ Available types are:
             }
         ]
         ```
+
+
+# Data Structures
+
+## Loan (object)
+
+- id: 1 (number, required) - ID of the loan
+- url: https://app.zonky.cz/loan/1 (string, optional) - The permalink for the loan
+   The link refers to the official Zonky website with detail of the loan.
+   It is intended to be used by 3rd party applications,
+   which can simply use the obtained link instead of generating a custom one.
+   The main advantage of this link is guarantee that it will be valid in long term.
+    
+- name: Loan refinancing (string, required) - Name of the loan
+- story: Dear investors, ... (string) - Short story of the loan
+    Usually some story about the purpose of a loan that attracts investors
+    
+- purpose: 6 (string, required) - Purpose of the loan (code from the register)
+- photos (array[Photo]) - Photos attached to this loan
+- nickName: zonky0 (string, required) - Borrower's nickname
+- termInMonths: 42 (number, required) - Loan term (in months)
+- interestRate: 0.059900 (number, required) - Interest rate for investors
+- rating: AAA (string, required) - Rating of the loan
+    Rating is a risk category for the loan determined after scoring
+
+- topped (boolean, nullable) - true if loan has been topped, false otherwise
+- amount: 200000.00 (number, required) - The amount offered to and accepted by borrower
+- remainingInvestment: 152600.00 (number, required) - The remaining amount available for investment
+- investmentRate: 0.237 (number, required) - Current investment rate
+- covered: false (boolean, required) - true if the loan is covered, false otherwise
+- datePublished: `2016-04-19T18:25:41.208+02:00` (string, required) - Date of the loan publication on marketplace
+- published: true (boolean, required) - true if the loan has been published on the marketplace, false otherwise
+- deadline: `2016-04-26T18:23:53.101+02:00` (string, required) - Deadline of the loan
+    Only loans with deadline after actual date and time are visible in the marketplace
+    
+- investmentsCount: 72 (number, required) - The count of investments attached to this loan
+- questionsCount: 3 (number, required) - The count of questions attached to this loan
+- region: 6 (string, required) - The code of the region
+- mainIncomeType: EMPLOYMENT (string, required) - The type of the income that is set as primary
+
+## Photo (object)
+
+- name: 6 (string, required) - Name of the photo
+- url: /loans/31959/photos/1987 (string, required) - Relative URL to the photo
