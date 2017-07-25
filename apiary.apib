@@ -1,5 +1,5 @@
 FORMAT: 1A
-HOST: https://api.zonky.cz/
+HOST: https://api.zonky.cz
 
 # Zonky REST API
 
@@ -54,6 +54,9 @@ If you find any bug in our API please use [admin@zonky.cz](mailto:admin@zonky.cz
 
 ## 0.46.0
 * Updated documentation of the loan response.
+
+## 0.54.0
+* Added Secondary marketplace resources.
 
 
 # OAuth 2 authentication
@@ -120,7 +123,7 @@ for example ```datePublished__gt=2016-08-20T23:59:59.000+02:00``` or ```datePubl
 Not all fields are available for sorting and filtering. In such cases you will be informed that your action is not allowed with a response ```400 Bad Request```
 and details in the response body:
 
-```
+```json
 {
   "error" : "invalid_filter",
   "error_description" : "Filter or ordering property not allowed: amount",
@@ -139,7 +142,7 @@ Token authentication endpoint.
 
 + Model (application/json)
 
-    ```js
+    ```json
     {
         "access_token" : "c5f6b996-47aa-4c59-8fc7-8a03fcf5da9d",
         "token_type" : "bearer",
@@ -236,7 +239,7 @@ Investments of the loan selected by ID.
 
 + Model (application/json)
 
-    ```js
+    ```json
     [
       {
         "id": 123456,
@@ -311,7 +314,7 @@ The time before investing opens for all requests without authorization may chang
         
     + Body
 
-        ```js
+        ```json
         {
               "amount" : 200,
               "loanId" : 1,
@@ -327,7 +330,7 @@ The time before investing opens for all requests without authorization may chang
 
     + Body
 
-        ```js
+        ```json
         {
               "error" : "CAPTCHA_REQUIRED",
               "error_description" : "Captcha authorization is required."
@@ -340,7 +343,7 @@ The time before investing opens for all requests without authorization may chang
 
     + Body
     
-        ```js
+        ```json
         {
               "error" : "CAPTCHA_VERIFICATION_UNSUCCESSFUL",
               "error_description" : "Captcha verification failed."
@@ -368,7 +371,7 @@ Increase existing investment.
         
     + Body
 
-        ```js
+        ```json
         {
               "amount" : 200
         }
@@ -377,6 +380,134 @@ Increase existing investment.
 + Response 200
 
 
+# Group Secondary marketplace
+
+## Investor selling his investments [/users/me/traded-investments]
+
+### Publishing investments [POST]
+
+Offer an investment for sale on the secondary marketplace.
+
++ Request
+
+    + Headers
+        
+                Content-Type: application/json
+                Authorization: Bearer 674e7f35-7aba-4cec-858c-f48861e9dc21
+    
+    + Attributes ([SMPPublishingRequest][])
+
++ Response 204
+    
+    Investment has been successfully published on the secondary marketplace
+    
+    + Body
+
++ Response 400
+
+    Investment cannot be published on secondary marketplace
+
+    + Attributes([SMPPublishingError][])
+
++ Response 408
+
+    Request timeout
+    
+    + Body
+   
+## Investor managing his existing offers [/users/me/traded-investments/{investmentId}]
+
++ Parameters
+
+    + investmentId (integer, `123`) - ID of an investment
+
+### Cancelling investment offers [DELETE]
+
+Take investment down from the secondary marketplace
+
++ Response 204
+
+    In case investment was successfully taken down from the secondary marketplace.
+    
+    + Body
+
++ Response 410
+
+    In case investment could not be taken down due to reason described by `error`.
+
+    + Attributes([SMPCancelOfferError][])
+
+## Purchasing investments on secondary marketplace [/smp/investments]
+
+### Listing investments [GET]
+
+Get the list of investments that are available for purchase on the secondary marketplace.
+
+Available sorting and filtering fields:
+
+| Field        | Sorting           | Filtering  |
+| :------------- |:-------------:|:-----:|
+|```rating```| YES| YES |
+|```deadline```| YES| YES |
+|```remainingInstalmentCount```| YES| YES |
+|```remainingPrincipal```| YES| YES |
+|```purpose```| YES| YES |
+|```incomeType```| YES| YES |
+
++ Response 200 
+
+    Returning list of found investments on secondary marketplace
+
+    + Attributes (array[SMPInvestment])
+
++ Response 408
+
+    Request timeout
+
+    + Body
+
+## SMP investment participations [/smp/investments/{id}/shares]
+
+At the moment it is not allowed to purchase only a part of offered investment. Investors have to buy the whole investment
+so there can be only 1 purchase per 1 offered investment. This may be eventually possible in the future and API is already 
+prepared for this situation. 
+
++ Parameters
+
+    + id: 1 (integer) - ID of an investment offer
+
+### Purchasing investments [POST]
+
+Purchase a share of an investment offer on the secondary marketplace
+
++ Request
+    
+    + Attributes([SMPPurchaseRequest][])
+
++ Response 204
+    
+    Successful purchase
+    
+    + Body
+
++ Response 400
+    
+    Cannot proceed with investment purchase
+    
+    + Attributes([SMPPurchaseError][])
+        
+    
++ Response 404
+
+    Investment offer is not available (in some cases it is because the offer is already purchased by another investor)
+    
+    + Body
+
++ Response 408
+    
+    Request timeout
+    
+    + Body
 
 # Group Notifications
 
@@ -429,7 +560,7 @@ Available types are:
 
     + Body
     
-        ```js
+        ```json
         [
             {
                 "date":"2017-04-20T00:05:55.555+02:00",
@@ -446,7 +577,7 @@ Available types are:
                 "id":222222
             },
             {
-                "date":"2017-04-19T11:19:42.320+02:00"
+                "date":"2017-04-19T11:19:42.320+02:00",
                 "visited":false,
                 "text":"Opožděná splátka od zonky1234 právě přistála ve vaší peněžence. ",
                 "link":
@@ -473,11 +604,8 @@ Available types are:
    It is intended to be used by 3rd party applications,
    which can simply use the obtained link instead of generating a custom one.
    The main advantage of this link is guarantee that it will be valid in long term.
-    
 - name: Loan refinancing (string, required) - Name of the loan
-- story: Dear investors, ... (string) - Short story of the loan
-    Usually some story about the purpose of a loan that attracts investors
-    
+- story: Dear investors, ... (string) - Short story of the loan. Usually some story about the purpose of a loan that attracts investors
 - purpose: 6 (string, required) - Purpose of the loan (code from the register)
 - photos (array[Photo]) - Photos attached to this loan
 - nickName: zonky0 (string, required) - Borrower's nickname
@@ -485,7 +613,6 @@ Available types are:
 - interestRate: 0.059900 (number, required) - Interest rate for investors
 - rating: AAA (string, required) - Rating of the loan
     Rating is a risk category for the loan determined after scoring
-
 - topped (boolean, nullable) - true if loan has been topped, false otherwise
 - amount: 200000.00 (number, required) - The amount offered to and accepted by borrower
 - remainingInvestment: 152600.00 (number, required) - The remaining amount available for investment
@@ -494,8 +621,7 @@ Available types are:
 - datePublished: `2016-04-19T18:25:41.208+02:00` (string, required) - Date of the loan publication on marketplace
 - published: true (boolean, required) - true if the loan has been published on the marketplace, false otherwise
 - deadline: `2016-04-26T18:23:53.101+02:00` (string, required) - Deadline of the loan
-    Only loans with deadline after actual date and time are visible in the marketplace
-    
+    Only loans with deadline after actual date and time are visible in the marketplace 
 - investmentsCount: 72 (number, required) - The count of investments attached to this loan
 - questionsCount: 3 (number, required) - The count of questions attached to this loan
 - region: 6 (string, required) - The code of the region
@@ -505,3 +631,55 @@ Available types are:
 
 - name: 6 (string, required) - Name of the photo
 - url: /loans/31959/photos/1987 (string, required) - Relative URL to the photo
+
+## SMPInvestment (object)
+
+- id: 1 (number, required) - ID of an investment offer
+- loanId: 1 (number, required) - ID of a related loan
+- userId: 1 (number, required) - ID of an investor offering his investment
+- loanName: Loan refinancing (string, required) - Name of a loan
+- rating: AAA (enum[string], required) - Rating of the loan
+    - Members
+        - `AAAAA`
+        - `AAAA`
+        - `AAA`
+        - `AA`
+        - `A`
+        - `B`
+        - `C`
+        - `D`
+- interestRate: 0.059900 (number, required) - Interest rate for investors
+- remainingInstalmentCount: 12 (number, required) - Number of remaining unpaid instalments 
+- originalInstalmentCount: 24 (number, required) - Number of instalments at the time when a loan was first published on primary marketplace
+- remainingPrincipal: 11500 (number, required) - Remaining principal is the unreturned part of the whole investment and at the same time it's the amount for which an investment can be purchased
+- nextPaymentDate: `2016-04-19` (string, required) - The due date of the next instalment
+- deadline: `2016-04-19T18:25:41.208+02:00` (string, required) - purchase offer on secondary marketplace will be cancelled after this deadline
+
+## SMPPurchaseRequest (object)
+- amount: 5000 (number, required) - the purchase amount, currently it has to be equal to the total value of investment offered for purchase 
+
+## SMPPurchaseError (object)
+
+- error: INSUFFICIENT_BALANCE (enum[string], required)
+    - Members
+        - `INSUFFICIENT_BALANCE`
+        - `ALREADY_HAVE_INVESTMENT`
+- description: Cannot proceed with investment on secondary marketplace due to insufficient wallet balance (string, required)
+
+## SMPPublishingRequest (object)
+- investmentId: 1 (number, required) - ID of an investment  
+
+## SMPPublishingError (object)
+
+- error: PUBLISHING_NOT_ALLOWED (enum[string], required)
+    - Members
+        - `PUBLISHING_NOT_ALLOWED`
+- description: Publishing not allowed
+
+## SMPCancelOfferError (object)
+
+- error: EXPIRED_ON_SMP (enum[string], required) - Error code
+    - Members
+        - `EXPIRED_ON_SMP`
+        - `ALREADY_SOLD`
+- description: The offer has expired (string, required) - Error description
