@@ -58,6 +58,9 @@ If you find any bug in our API please use [admin@zonky.cz](mailto:admin@zonky.cz
 ## 0.54.0
 * Added Secondary marketplace resources.
 
+## 0.58.0
+* Partial response - possible to filter fields in json responses 
+
 
 # OAuth 2 authentication
 
@@ -132,7 +135,29 @@ and details in the response body:
   "operation" : "X-Order"
 }
 ```
+## Partial response
+To relieve network throughput, fields in json responses can be filtered out by providing query parameter ```fields``` with comma separated list of fields that you are interested in. 
 
+There are two restrictions:
+* Some fields cannot be filtered out. Typically boolean values or sume numbers. There is no list of this values 
+* Only 1st level fields can be filtered. Filtering inside nested json objects is not possible.
+
+Example:
+Request: ```GET http://api.zonky/loans/marketplace?fields=id,url```
+
+Response:
+```json
+[
+  {
+    "id": 123,
+    "url": "https://app.zonky.cz/loan/123"
+  },
+  {
+    "id": 456,
+    "url": "https://app.zonky.cz/loan/456"
+  }
+]
+```
 
 # Group OAuth
 
