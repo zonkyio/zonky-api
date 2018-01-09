@@ -59,7 +59,10 @@ If you find any bug in our API please use [admin@zonky.cz](mailto:admin@zonky.cz
 * Added Secondary marketplace resources.
 
 ## 0.58.0
-* Partial response - possible to filter fields in json responses 
+* Partial response - possible to filter fields in json responses
+
+## 0.76.0
+* Allowing to filter `/users/me/wallet/transactions` resource by a loan ID
 
 
 # OAuth 2 authentication
@@ -593,6 +596,7 @@ Available sorting and filtering fields:
 | Field        | Sorting           | Filtering  |
 | :------------- |:-------------:|:-----:|
 |```transaction.transactionDate```| YES | YES |
+|```investment.loan.id```| NO | YES |
 
 + Request
 
