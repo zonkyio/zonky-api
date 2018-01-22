@@ -114,8 +114,10 @@ Resource records can be filtered by providing query parameters matching the foll
 |  noteq        | Retrieves object if property not equals to provided value (case-sensitive)            | ```?rating__noteq=A``` |
 |  gt           | Retrieves object if property is greater than provided value                           | ```termInMonths__gt=24``` |
 |  gte          | Retrieves object if property is greater or equal to provided value                    | ```termInMonths__gte=24``` |
+|  gteornull    | Retrieves object if property is greater or equal to provided value or is null         | ```termInMonths__gteornull=24``` |
 |  lt           | Retrieves object if property is less than provided value                              | ```termInMonths__lt=24``` |
 |  lte          | Retrieves object if property is less or equal to provided value                       | ```termInMonths__lte=24``` |
+|  lteornull    | Retrieves object if property is less or equal to provided value or is null            | ```termInMonths__lteornull=24``` |
 |  containsall  | Retrieves object if property is collection of simple values (string, number) and contains all values in the provided list | ```listField__containsall=["value1","value2"]``` |
 |  containsany  | Retrieves object if property is collection of simple values (string, number) and contains any value from the provided list | ```listField__containsany=["value1","value2"]``` |
 
