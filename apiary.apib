@@ -64,6 +64,9 @@ If you find any bug in our API please use [admin@zonky.cz](mailto:admin@zonky.cz
 ## 0.76.0
 * Allowing to filter `/users/me/wallet/transactions` resource by a loan ID
 
+## 0.87.0
+* Added resource related to insurance
+
 
 # OAuth 2 authentication
 
@@ -755,6 +758,9 @@ Available types are:
 - questionsCount: 3 (number, required) - The count of questions attached to this loan
 - region: 6 (string, required) - The code of the region
 - mainIncomeType: EMPLOYMENT (string, required) - The type of the income that is set as primary
+- insuranceActive: true (boolean,required) - Insurance is active
+- insuranceHistory: InsuranceHistoryItem (array[InsuranceHistoryItem], required) - All insurance intervals
+
 
 ## Photo (object)
 
@@ -820,6 +826,13 @@ Available types are:
 - timeCreated: `2016-04-19T18:25:41.208+02:00` (string, required) - The date when an investment was created  
 - activeTo: `2016-04-19T18:25:41.208+02:00` (string) - The date of sale on a secondary marketplace (if sold)       
 - smpFee: 0 (number) - a fee that has been taken for selling an investment on a secondary marketplace (if sold)        
+- instalmentPostponement: true (boolean,required) - Instalments are postponed due to insurance event
+- insuranceActive: true (boolean,required) - Insurance is active
+- insuranceHistory: InsuranceHistoryItem (array[InsuranceHistoryItem], required) - All insurance intervals
+
+## InsuranceHistoryItem (object)
+- policyPeriodFrom: `2016-04-18` (string, required)
+- policyPeriodTo: `2016-04-19` (string, required)
 
 ## Wallet (object)
 
