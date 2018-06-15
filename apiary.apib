@@ -606,6 +606,7 @@ Available sorting and filtering fields:
 | :------------- |:-------------:|:-----:|
 |```transaction.transactionDate```| YES | YES |
 |```investment.loan.id```| NO | YES |
+|```investment.id```| NO | YES |
 
 + Request
 
@@ -889,6 +890,7 @@ Available types are:
     - Members
         - `IN` - incoming transaction
         - `OUT` - outgoing transaction
+- investmentId: 1 (number, nullable) - ID of the related investment
 - loanId: 1 (number, nullable) - ID of the related loan
 - loanName: Loan refinancing (string, nullable) - name of the related loan
 - nickName: Zonky01 (string, nullable) - name of the related borrower
