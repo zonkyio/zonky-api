@@ -73,16 +73,48 @@ If you find any bug in our API please use [admin@zonky.cz](mailto:admin@zonky.cz
 
 # OAuth 2 authentication
 
-Zonky users are identified using [OAuth 2.0](http://oauth.net/2/) protocol. At the moment we support only OAuth 2 
+Zonky users are identified using [OAuth 2.0](http://oauth.net/2/) protocol. At the moment we support OAuth 2
 [Resource Owner Password Credentials grant flow](https://tools.ietf.org/html/rfc6749#section-4.3) where user receives an access token and
-a refresh token in exchange for their username and password. 
+a refresh token in exchange for their username and password and [Authorization Code Grant Flow ](https://tools.ietf.org/html/rfc6749#page-24) where
+client app obtains authorization code which is later exchanged for access token
 
 **Acting** on **behalf** of other **users** by supplying their **credentials** is strictly **prohibited**. Applications violating this rule will be banned with no mercy. We may eventually extend our implemenation with [Authorization Code Grant flow](https://tools.ietf.org/html/rfc6749#section-4.1) allowing  3rd party applications to act on behalf of a registered user.
 
 ## Access token and refresh token
-To keep things as secure as possible you have to pay attention to the right usage of OAuth authentication protocol. The right way is to obtain 
+To keep things as secure as possible you have to pay attention to the right usage of OAuth authentication protocol. The right way is to obtain
 an access token and a refresh token with user's credentials *on the first authentication request*. Retrieved access token has limited validity (advertised in the
 response). After its expiration you should retrieve a new one with a refresh token which has longer validity.
+
+## Authorization code grant Flow
+### Client onboarding
+Client application must obtain client credentials before it can use authorization code flow. To start onboarding process please send us email to oauth@zonky.cz
+with following details
+- application name
+- application description
+- requested scopes (list of scopes this app will need to operate)
+- redirect url ( target url where is user redirected after granting authorization code or in case of error) Url is verified for match except for params
+
+Zonky will evaluate your request and if everything is fine we will provide unique clientId and clientSecret for you. **ClientSecret is confidential** and should not
+be shared anywhere. Client id and client secret should be used in communication only between secured servers.
+
+### Authorization flow
+When client need to connect to protected resource and hasn't valid access token it should redirect user to `oauth/athorize` endpoint( find details at endpoint description).
+If user is logged in and client app is not approved zonky will display consent page with some basic info about client app. If client application is already approved
+consent page is not displayed again and fow continues directly. After successful approval user is forwarded to redirect url with authorization code.
+
+Client app can use authorization code to retrieve access token by calling `oauth/token` endpoint. Authorization code can be used only once and expires after 5 min.
+After successful authorization client app can use access token and refresh token for calling secured api. When refresh token expires client app must initiate
+new authorization code flow to obtain access and refresh token.
+
+User can revoke application approval anytime and it will lead to immediate revocation of all tokens.
+
+### Scopes
+Currently we have only one scope, that will give client application all rights to access zonky. It will likely change in future and more detailed scopes will exists.
+| Scope name     | Description           |
+| :------------- |:-------------         |
+| SCOPE_APP_WEB  | Allow all actions with account |
+| SCOPE_FILE_DOWNLOAD | Allow download files ( exports, contracts) |
+
 
 # Pagination, sorting and filtering
 All listing resources in this API stick to the same conventions of how to paginate, sort and filter data.
@@ -172,6 +204,21 @@ Response:
 
 # Group OAuth
 
+## Authorize [/oauth/authorize?response_type=code&client_id={client_id}&redirect_uri={redirect_uri}&scope={scopes}&state={state}]
+Endpoint specification is based on oauth specification
+
+### Get authorization code [GET]
++ Parameters
+    + client_id (string) - ID of client app
+    + redirect_uri (string) - Callback url where user is forwarded with authorization code. Redirect uri host and path must match with redirect uri provided during onboarding process.
+    + scopes (string) - **Space** separated list of scopes.
+    + state (string) - Nonce value that will be returned when user is redirected back. Client should check, that state matches. This value is opaque for authorization server and client can send any value as long as it is unique for every request
+
++ Response 302
+    + Headers
+
+            Location: Redirect url with param `code` and `state`. In case of error `error` and optionally `error_code` is returned instead
+
 ## Token [/oauth/token]
 
 Token authentication endpoint.
@@ -216,6 +263,18 @@ Token authentication endpoint.
 
 + Response 200
 
+    [Token][]
+
++ Request Get access token with authorization code (application/x-www-form-urlencoded)
+
+    + Headers
+
+            Authorization: Basic base64 client credentials
+
+    + Body
+
+            scope=SCOPE_APP_WEB&grant_type=authorization_code&code=CODE&redirect_uri=https%3A%2F%2Fgoogle.com
++ Response 200
     [Token][]
 
 
