@@ -73,19 +73,29 @@ If you find any bug in our API please use [admin@zonky.cz](mailto:admin@zonky.cz
 
 # OAuth 2 authentication
 
-Zonky users are identified using [OAuth 2.0](http://oauth.net/2/) protocol. At the moment we support OAuth 2
-[Resource Owner Password Credentials grant flow](https://tools.ietf.org/html/rfc6749#section-4.3) where user receives an access token and
-a refresh token in exchange for their username and password and [Authorization Code Grant Flow ](https://tools.ietf.org/html/rfc6749#page-24) where
-client app obtains authorization code which is later exchanged for access token
+Zonky users are identified using [OAuth 2.0](http://oauth.net/2/) protocol. At the moment we support following OAuth 2 grant types:
 
-**Acting** on **behalf** of other **users** by supplying their **credentials** is strictly **prohibited**. Applications violating this rule will be banned with no mercy. We may eventually extend our implemenation with [Authorization Code Grant flow](https://tools.ietf.org/html/rfc6749#section-4.1) allowing  3rd party applications to act on behalf of a registered user.
+* [Resource Owner Password Credentials Grant Flow ](https://tools.ietf.org/html/rfc6749#section-4.3) where user receives an access token and
+a refresh token in exchange for their username and password and
+* [Authorization Code Grant Flow ](https://tools.ietf.org/html/rfc6749#page-24) where client app obtains authorization code which is later
+exchanged for access token.
+
+In case you're going to create new application that is going to be used by other users, the Authorization Code Grant Flow should be used
+because that is the way how you can obtain a grant to user's account without knowing their credentials.
+
+In case you're just want to play with the API you can use the Resource Owner Password Credentials Grant Flow
+using your own credentials, of course.
+
+In case your app does not have its web service (e.g. a simple mobile app) there is no URL we could redirect the user to providing you the Authorization Code. In this case you can use the Password Credentials Grant Flow as well. The point here is that your app does not send the credentials anywhere. They are just part of the mobile app installation in the user's device.
+
+**Acting** on **behalf** of other **users** by supplying their **credentials** is strictly **prohibited**. Applications violating this rule will be banned with no mercy.
 
 ## Access token and refresh token
 To keep things as secure as possible you have to pay attention to the right usage of OAuth authentication protocol. The right way is to obtain
 an access token and a refresh token with user's credentials *on the first authentication request*. Retrieved access token has limited validity (advertised in the
 response). After its expiration you should retrieve a new one with a refresh token which has longer validity.
 
-## Authorization code grant Flow
+## Authorization Code Grant Flow
 ### Client onboarding
 Client application must obtain client credentials before it can use authorization code flow. To start onboarding process please send us email to oauth@zonky.cz
 with following details
@@ -114,6 +124,7 @@ Currently we have only one scope, that will give client application all rights t
 | :------------- |:-------------         |
 | SCOPE_APP_WEB  | Allow all actions with account |
 | SCOPE_FILE_DOWNLOAD | Allow download files ( exports, contracts) |
+| SCOPE_APP_BASIC_INFO | Allow to show only basic info about the user's account (/users/me/basic) |
 
 
 # Pagination, sorting and filtering
