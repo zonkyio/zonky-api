@@ -70,6 +70,9 @@ If you find any bug in our API please use [admin@zonky.cz](mailto:admin@zonky.cz
 ## 0.91.0
 * Allowing to filter `/loans/marketplace` resource to show only insured/uninsured loans
 
+## 0.124.0
+* Changes to investment endpoints and new fields related to reservations
+
 
 # OAuth 2 authentication
 
@@ -312,6 +315,7 @@ Available sorting and filtering fields:
 |```incomes```| YES| YES |
 |```topped```| YES| YES |
 |```remainingInvestment```| YES| YES |
+|```nonReservedRemainingInvestment```| YES | YES |
 |```insuranceActive```| YES | YES |
 
 + Response 200 (application/json)
@@ -401,7 +405,7 @@ Available sorting fields:
 
 ## Investment [/marketplace/investment]
 
-Make a new investment.
+Make a new investment. Users can invest only within unreserved amount remaining to invest.
     
 ### POST
 
@@ -433,17 +437,26 @@ The time before investing opens for all requests without authorization may chang
 
 + Response 400
 
-    Captcha verification is required
+    The input is invalid.
+
+    Possible error codes are:
+    * ```CAPTCHA_REQUIRED``` - Captcha verification is required
+    * ```insufficientBalance``` - The user cannot invest because of a low wallet balance.
+    * ```cancelled``` - The loan has been canceled
+    * ```withdrawn``` - The loan has been withdrawn by the borrower
+    * ```reservedInvestmentOnly``` - The user cannot invest without a reservation. The whole remaining investment is reserved for other users. See `remainingInvestment` and `reservedAmount`.
+    * ```overInvestment``` - The amount for investment is too high. See `remainingInvestment`.
+    * ```multipleInvestment``` - The user has already invested to this loan. Try increasing the investment instead.
+    * ```alreadyCovered``` - The whole loan amount has been already covered. See `remainingInvestment`.
 
     + Body
 
         ```json
         {
-              "error" : "CAPTCHA_REQUIRED",
-              "error_description" : "Captcha authorization is required."
+              "error" : "reservedInvestmentOnly"
         }
         ```
-    
+
 + Response 403
 
     Captcha verification was unsuccessful
@@ -459,7 +472,7 @@ The time before investing opens for all requests without authorization may chang
 
 ## Investment increase [/marketplace/investment/{investment}]
 
-Increase invested amount for an existing investment.
+Increase invested amount for an existing investment. Users can invest only within unreserved amount remaining to invest.
 
 + Parameters
 
@@ -486,6 +499,27 @@ Increase existing investment.
 
 + Response 200
 
+
++ Response 400
+
+    The input is invalid.
+
+    Possible error codes are:
+    * ```insufficientBalance``` - The user cannot invest because of a low wallet balance.
+    * ```cancelled``` - The loan has been canceled
+    * ```withdrawn``` - The loan has been withdrawn by the borrower
+    * ```reservedInvestmentOnly``` - The user cannot invest without a reservation. The whole remaining investment is reserved for other users. See `remainingInvestment` and `reservedAmount`.
+    * ```overInvestment``` - The amount for investment is too high. See `remainingInvestment`.
+    * ```increaseInvestmentNotExist``` - The user has not invested to the loan yet. Try investing first.
+    * ```alreadyCovered``` - The whole loan amount has been already covered. See `remainingInvestment`.
+
+    + Body
+
+        ```json
+        {
+              "error" : "reservedInvestmentOnly"
+        }
+        ```
 
 # Group Secondary marketplace
 
@@ -822,7 +856,8 @@ Available types are:
     Rating is a risk category for the loan determined after scoring
 - topped (boolean, nullable) - true if loan has been topped, false otherwise
 - amount: 200000.00 (number, required) - The amount offered to and accepted by borrower
-- remainingInvestment: 152600.00 (number, required) - The remaining amount available for investment
+- remainingInvestment: 152600.00 (number, required) - The remaining amount available for investment, users without a reservation can invest only amount equal to `remainingInvestment - reservedAmount`
+- reservedAmount: 1000.00 (number, required) - The amount reserved for investors with a reservation for given loan, when not zero, users without reservations can invest only amount equal to `remainingInvestment - reservedAmount`
 - investmentRate: 0.237 (number, required) - Current investment rate
 - covered: false (boolean, required) - true if the loan is covered, false otherwise
 - datePublished: `2016-04-19T18:25:41.208+02:00` (string, required) - Date of the loan publication on marketplace
