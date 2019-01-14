@@ -86,7 +86,7 @@ exchanged for access token.
 In case you're going to create new application that is going to be used by other users, the Authorization Code Grant Flow should be used
 because that is the way how you can obtain a grant to user's account without knowing their credentials.
 
-In case you're just want to play with the API you can use the Resource Owner Password Credentials Grant Flow
+In case you just want to play with the API you can use the Resource Owner Password Credentials Grant Flow
 using your own credentials, of course.
 
 In case your app does not have its web service (e.g. a simple mobile app) there is no URL we could redirect the user to providing you the Authorization Code. In this case you can use the Password Credentials Grant Flow as well. The point here is that your app does not send the credentials anywhere. They are just part of the mobile app installation in the user's device.
@@ -111,9 +111,9 @@ Zonky will evaluate your request and if everything is fine we will provide uniqu
 be shared anywhere. Client id and client secret should be used in communication only between secured servers.
 
 ### Authorization flow
-When client need to connect to protected resource and hasn't valid access token it should redirect user to `oauth/athorize` endpoint( find details at endpoint description).
+When client needs to connect to protected resource and hasn't valid access token it should redirect user to `oauth/authorize` endpoint( find details at endpoint description).
 If user is logged in and client app is not approved zonky will display consent page with some basic info about client app. If client application is already approved
-consent page is not displayed again and fow continues directly. After successful approval user is forwarded to redirect url with authorization code.
+consent page is not displayed again and flow continues directly. After successful approval user is forwarded to redirect url with authorization code.
 
 Client app can use authorization code to retrieve access token by calling `oauth/token` endpoint. Authorization code can be used only once and expires after 5 min.
 After successful authorization client app can use access token and refresh token for calling secured api. When refresh token expires client app must initiate
