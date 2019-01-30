@@ -854,6 +854,8 @@ Available types are:
 - nickName: zonky0 (string, required) - Borrower's nickname
 - termInMonths: 42 (number, required) - Loan term (in months)
 - interestRate: 0.059900 (number, required) - Interest rate for investors
+- revenueRate: 0.049900 (number, required) - revenue rate for investors (loan interest rate - investment fee)
+- annuityWithInsurance: 2543.00 (number, required) - loan annuity including insurance premium (if insured)
 - rating: AAA (string, required) - Rating of the loan
     Rating is a risk category for the loan determined after scoring
 - topped (boolean, nullable) - true if loan has been topped, false otherwise
@@ -889,7 +891,6 @@ Available types are:
 - firstAmount: 2000 (number, required) - investment amount before eventual investment increase
 - purchasePrice: 0 (number) - purchase amount when the investment has been purchased on secondary marketplace
 - interestRate: 0.059900 (number, required) - loan interest rate
-- revenueRate: 0.049900 (number, required) - revenue rate for investors (loan interest rate - investment fee)
 - nickname: Zonky01 (string, required) - borrower's nickname
 - firstName: TestFirstname (string, required) - borrower's firstname
 - surname: TestSurname (string, required) - borrower's surname
@@ -919,7 +920,6 @@ Available types are:
 - dpd: 0 (number, required) - number of days after a due date of the oldest unpaid instalment
 - amountDue: 0 (number, required) - total due amount
 - loanTermInMonth: 24 (number, required) - original number of loan instalments (at the time of investment)
-- annuityWithInsurance: 2543.00 (number, required) - loan annuity including insurance premium (if insured)
 - paidInterest: 134.20 (number, required) - total sum of paid interest
 - dueInterest: 0 (number, required) - total sum of due interest
 - paidPrincipal: 2560.50 (number, required) - total sum of paid principal
