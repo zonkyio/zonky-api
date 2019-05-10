@@ -860,6 +860,7 @@ Available types are:
     Rating is a risk category for the loan determined after scoring
 - topped (boolean, nullable) - true if loan has been topped, false otherwise
 - amount: 200000.00 (number, required) - The amount offered to and accepted by borrower
+- currency: `CZK` (string, required) - Currency code based on ISO-4217
 - remainingInvestment: 152600.00 (number, required) - The remaining amount available for investment, users without a reservation can invest only amount equal to `remainingInvestment - reservedAmount`
 - reservedAmount: 1000.00 (number, required) - The amount reserved for investors with a reservation for given loan, when not zero, users without reservations can invest only amount equal to `remainingInvestment - reservedAmount`
 - investmentRate: 0.237 (number, required) - Current investment rate
@@ -888,6 +889,7 @@ Available types are:
 - loanName: New car (string, required) - Loan name
 - investmentDate: `2016-04-19T18:25:41.208+02:00` (string, required) - Date of investment
 - amount: 4000 (number, required) - investment amount
+- currency: `CZK` (string, required) - Currency code based on ISO-4217
 - firstAmount: 2000 (number, required) - investment amount before eventual investment increase
 - purchasePrice: 0 (number) - purchase amount when the investment has been purchased on secondary marketplace
 - interestRate: 0.059900 (number, required) - loan interest rate
@@ -952,6 +954,7 @@ Available types are:
 
 - id: 1 (number, required)
 - balance: 1000.00 (number, required)
+- currency: `CZK` (string, required) - Currency code based on ISO-4217
 - availableBalance: 900.00 (number, required)
 - blockedBalance: 100.00 (number, required)
 - creditSum: 20000.00 (number, required)
@@ -970,6 +973,7 @@ Available types are:
 
 - id: 1 (number, required) - ID of a transaction
 - amount: 1000.00 (number, required) - transaction amount
+- currency: `CZK` (string, required) - Currency code based on ISO-4217
 - category: INVESTMENT (enum[string], required) - transaction category
     - Members
         - `DEPOSIT` - deposit to investor's wallet
@@ -1008,6 +1012,7 @@ Available types are:
 ## BlockedAmount (object)
 
 - amount: 50.00 (number, required) - transaction amount
+- currency: `CZK` (string, required) - Currency code based on ISO-4217
 - category: INVESTMENT_FEE (enum[string], required) - transaction category
     - Members
         - `DEPOSIT` - deposit to investor's wallet
@@ -1053,7 +1058,8 @@ Available types are:
         - `C`
         - `D`
 - interestRate: 0.059900 (number, required) - Interest rate for investors
-- remainingInstalmentCount: 12 (number, required) - Number of remaining unpaid instalments 
+- remainingInstalmentCount: 12 (number, required) - Number of remaining unpaid instalments
+- currency: `CZK` (string, required) - Currency code based on ISO-4217
 - originalInstalmentCount: 24 (number, required) - Number of instalments at the time when a loan was first published on primary marketplace
 - remainingPrincipal: 11500 (number, required) - Remaining principal is the unreturned part of the whole investment and at the same time it's the amount for which an investment can be purchased
 - nextPaymentDate: `2016-04-19` (string, required) - The due date of the next instalment
