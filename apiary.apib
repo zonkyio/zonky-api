@@ -849,7 +849,17 @@ Available types are:
    The main advantage of this link is guarantee that it will be valid in long term.
 - name: Loan refinancing (string, required) - Name of the loan
 - story: Dear investors, ... (string) - Short story of the loan. Usually some story about the purpose of a loan that attracts investors
-- purpose: 6 (string, required) - Purpose of the loan (code from the register)
+- purpose: `REFINANCING` (enum[string], required) - Purpose of the loan
+    - Members
+        - `AUTO_MOTO`
+        - `EDUCATION`
+        - `TRAVEL`
+        - `ELECTRONICS`
+        - `HEALTH`
+        - `REFINANCING`
+        - `HOUSEHOLD`
+        - `OWN_PROJECT`
+        - `OTHER`
 - photos (array[Photo]) - Photos attached to this loan
 - nickName: zonky0 (string, required) - Borrower's nickname
 - termInMonths: 42 (number, required) - Loan term (in months)
