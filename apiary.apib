@@ -3,11 +3,11 @@ HOST: https://api.zonky.cz
 
 # Zonky REST API
 
-The Zonky REST API provides programmatic access to Zonky data in JSON format. 
+The Zonky REST API provides programmatic access to Zonky data in JSON format.
 
 We know that API exposed on _api.zonky.cz_ endpoint is public, but please be aware that the part of the API
-documented here is a subset of our API we ourselves consider _public_. We expect someone else may use this API and therefore we 
-try to keep it backward compatible or at least let you know about upcoming changes in advance. 
+documented here is a subset of our API we ourselves consider _public_. We expect someone else may use this API and therefore we
+try to keep it backward compatible or at least let you know about upcoming changes in advance.
 We may not gurantee anything since the API is primarily used by Zonky itself, but you have our promise we will do our best to not break your work.
 
 # Rules of thumb
@@ -19,7 +19,7 @@ We can promote your application to thousands of customers, let you know in advan
 
 ## Use User-Agent
 
-Every HTTP client should send the User-Agent header according to [HTTP/1.1 semantics and content](https://tools.ietf.org/html/rfc7231#section-5.5.3). 
+Every HTTP client should send the User-Agent header according to [HTTP/1.1 semantics and content](https://tools.ietf.org/html/rfc7231#section-5.5.3).
 The header should contain application, version and contact information (URL).
 
 * the User-Agent pattern: ```${application}/${version} (${url})```
@@ -31,11 +31,19 @@ The User-Agent header helps us in many areas. We may use this header to analyze 
 Beware, the dark side is listening. Use secure transport protocol (HTTPS) when accessing Zonky.
 
 ## User credentials
-It's prohibited to ask for credentials (username, password) of other users. It's a security issue and a violation of the 
+It's prohibited to ask for credentials (username, password) of other users. It's a security issue and a violation of the
 [Zonky terms & conditions](https://zonky.cz/downloads/Zonky_Pravidla_portalu.pdf).
 
 ## API Quota, limits, rate limiting, QoS
-And other ugly words may follow. Please take into account that even our system has limits. Do to this API as you would have others to do to your own API. The Force awakens...
+And other ugly words may follow. Please take into account that even our system has limits. Do to this API as you would have others to do to your own API.
+
+Currently, there is an API Throttle functionality that forbids users to make huge amount of requests per time interval. The algorithm used is [Leaky Bucket](https://en.wikipedia.org/wiki/Leaky_bucket) that refreshes one token every second with a capacity of 500 tokens.
+
+It means that if your robot makes one request per seconds on average, you're fine. You can choose whether it is making one request every second, 500 requests every 500 seconds on something in between. These numbers can be changed anytime so make your client aware of the throttled HTTP response.
+
+In case of client hitting the limit, the API responds with HTTP status code 429 - Too Many Requests.
+
+If you're trying to accomplish any use case and the API Throttling functionality is preventing you from success, please contact us and we'll try to figure something out.
 
 ## Bugs and improvements
 If you find any bug in our API please use [admin@zonky.cz](mailto:admin@zonky.cz). Feel free to ask questions or propose improvements regarding the API via [Zonky API GitHub project](https://github.com/zonkyio/zonky-api) or [admin@zonky.cz](mailto:admin@zonky.cz).
@@ -137,16 +145,16 @@ Currently we have only one scope, that will give client application all rights t
 All listing resources in this API stick to the same conventions of how to paginate, sort and filter data.
 
 ## Pagination
-You can query for a subset of data provided by a resource using ```X-Page``` and ```X-Size``` headers. Numbering starts with ```0``` and reasonable defaults are set for cases when 
-no headers are present in the request. 
+You can query for a subset of data provided by a resource using ```X-Page``` and ```X-Size``` headers. Numbering starts with ```0``` and reasonable defaults are set for cases when
+no headers are present in the request.
 
 Total number of records is indicated in the response with ```X-Total``` header.
 
-For example if you query a resource with a total of 40 records with headers ```X-Page: 0``` and ```X-Size: 20``` the API will return records ```0-19``` 
+For example if you query a resource with a total of 40 records with headers ```X-Page: 0``` and ```X-Size: 20``` the API will return records ```0-19```
 and ```X-Total: 40``` header value.
 
 ## Sorting
-You can sort output data by setting ```X-Order``` header in the request. As a value use list of field names separated by a comma ```,```. 
+You can sort output data by setting ```X-Order``` header in the request. As a value use list of field names separated by a comma ```,```.
 Putting ```-``` before the field name indicates descending order.
 
 For example:
@@ -177,8 +185,8 @@ Resource records can be filtered by providing query parameters matching the foll
 |  containsany  | Retrieves object if property is collection of simple values (string, number) and contains any value from the provided list | ```listField__containsany=["value1","value2"]``` |
 
 ## Data types
-When filtering with ```gt```, ```gte```, ```lt```, ```lte``` it is possible to use ISO-8601 [date](https://docs.oracle.com/javase/8/docs/api/java/time/format/DateTimeFormatter.html#ISO_DATE) or [datetime](https://docs.oracle.com/javase/8/docs/api/java/time/format/DateTimeFormatter.html#ISO_OFFSET_DATE_TIME) data type in format, 
-for example ```datePublished__gt=2016-08-20T23:59:59.000+02:00``` or ```datePublished__lt=2016-08-20```. When no time zone offset is present in incoming data, API will use default platform time zone 
+When filtering with ```gt```, ```gte```, ```lt```, ```lte``` it is possible to use ISO-8601 [date](https://docs.oracle.com/javase/8/docs/api/java/time/format/DateTimeFormatter.html#ISO_DATE) or [datetime](https://docs.oracle.com/javase/8/docs/api/java/time/format/DateTimeFormatter.html#ISO_OFFSET_DATE_TIME) data type in format,
+for example ```datePublished__gt=2016-08-20T23:59:59.000+02:00``` or ```datePublished__lt=2016-08-20```. When no time zone offset is present in incoming data, API will use default platform time zone
 (```Europe/Prague```) for parsing.
 
 
@@ -196,10 +204,10 @@ and details in the response body:
 }
 ```
 ## Partial response
-To relieve network throughput, fields in json responses can be filtered out by providing query parameter ```fields``` with comma separated list of fields that you are interested in. 
+To relieve network throughput, fields in json responses can be filtered out by providing query parameter ```fields``` with comma separated list of fields that you are interested in.
 
 There are two restrictions:
-* Some fields cannot be filtered out. Typically boolean values or sume numbers. There is no list of this values 
+* Some fields cannot be filtered out. Typically boolean values or sume numbers. There is no list of this values
 * Only 1st level fields can be filtered. Filtering inside nested json objects is not possible.
 
 Example:
@@ -326,7 +334,7 @@ Token authentication endpoint.
     [Token][]
 
 # Group Marketplace
-    
+
 ## Marketplace [/loans/marketplace]
 
 Overview of loans on the marketplace.
@@ -354,7 +362,7 @@ Available sorting and filtering fields:
 + Response 200 (application/json)
 
     + Attributes (array[Loan])
-    
+
 
 ## Loan [/loans/{id}]
 
@@ -371,7 +379,7 @@ Get loan detail.
 + Response 200 (application/json)
 
     + Attributes (Loan)
-    
+
 
 ## Loan investments [/loans/{id}/investments]
 
@@ -432,30 +440,30 @@ Available sorting fields:
 
     [Loan investments][]
 
-    
-    
+
+
 # Group Investing
 
 ## Investment [/marketplace/investment]
 
 Make a new investment. Users can invest only within unreserved amount remaining to invest.
-    
+
 ### POST
 
 #### reCAPTCHA authorization
 
-All investments that are made withing first 120 seconds after a loan publication on the marketplace 
-have to be authorized by [reCAPTCHA](https://www.google.com/recaptcha). 
+All investments that are made withing first 120 seconds after a loan publication on the marketplace
+have to be authorized by [reCAPTCHA](https://www.google.com/recaptcha).
 
 The time before investing opens for all requests without authorization may change anytime in the future.
 
 + Request
 
     + Headers
-    
+
             Content-Type: application/json
             Authorization: Bearer 674e7f35-7aba-4cec-858c-f48861e9dc21
-        
+
     + Body
 
         ```json
@@ -495,7 +503,7 @@ The time before investing opens for all requests without authorization may chang
     Captcha verification was unsuccessful
 
     + Body
-    
+
         ```json
         {
               "error" : "CAPTCHA_VERIFICATION_UNSUCCESSFUL",
@@ -510,7 +518,7 @@ Increase invested amount for an existing investment. Users can invest only withi
 + Parameters
 
     + investment: 1 (integer) - ID of an investment
-    
+
 ### PATCH
 
 Increase existing investment.
@@ -518,10 +526,10 @@ Increase existing investment.
 + Request
 
     + Headers
-    
+
             Content-Type: application/json
             Authorization: Bearer 674e7f35-7aba-4cec-858c-f48861e9dc21
-        
+
     + Body
 
         ```json
@@ -577,12 +585,12 @@ Available sorting and filtering fields:
 |```smpInvestment.status```| YES | YES `[ACTIVE]`| SMP status (if an investment has been offered on the secondary marketplace) |
 |```ext.purchasePrice```| YES | YES | Purchase price (if an investment has been bought on the secondary marketplace) |
 |```ext.activeTo```| YES | YES | The date of sale on a secondary marketplace (if sold)  |
-           
-+ Response 200 
+
++ Response 200
 
     Returns user's investments
 
-    + Attributes (array[Investment])        
+    + Attributes (array[Investment])
 
 ## Investor selling his investments [/users/me/traded-investments]
 
@@ -593,16 +601,16 @@ Offer an investment for sale on the secondary marketplace.
 + Request
 
     + Headers
-        
+
                 Content-Type: application/json
                 Authorization: Bearer 674e7f35-7aba-4cec-858c-f48861e9dc21
-    
+
     + Attributes ([SMPPublishingRequest][])
 
 + Response 204
-    
+
     Investment has been successfully published on the secondary marketplace
-    
+
     + Body
 
 + Response 400
@@ -614,9 +622,9 @@ Offer an investment for sale on the secondary marketplace.
 + Response 408
 
     Request timeout
-    
+
     + Body
-   
+
 ## Investor managing his existing offers [/users/me/traded-investments/{investmentId}]
 
 + Parameters
@@ -630,7 +638,7 @@ Take investment down from the secondary marketplace
 + Response 204
 
     In case investment was successfully taken down from the secondary marketplace.
-    
+
     + Body
 
 + Response 410
@@ -656,7 +664,7 @@ Available sorting and filtering fields:
 |```purpose```| YES| YES |
 |```incomeType```| YES| YES |
 
-+ Response 200 
++ Response 200
 
     Returning list of found investments on secondary marketplace
 
@@ -671,8 +679,8 @@ Available sorting and filtering fields:
 ## SMP investment participations [/smp/investments/{id}/shares]
 
 At the moment it is not allowed to purchase only a part of offered investment. Investors have to buy the whole investment
-so there can be only 1 purchase per 1 offered investment. This may be eventually possible in the future and API is already 
-prepared for this situation. 
+so there can be only 1 purchase per 1 offered investment. This may be eventually possible in the future and API is already
+prepared for this situation.
 
 + Parameters
 
@@ -683,32 +691,32 @@ prepared for this situation.
 Purchase a share of an investment offer on the secondary marketplace
 
 + Request
-    
+
     + Attributes([SMPPurchaseRequest][])
 
 + Response 204
-    
+
     Successful purchase
-    
+
     + Body
 
 + Response 400
-    
+
     Cannot proceed with investment purchase
-    
+
     + Attributes([SMPPurchaseError][])
-        
-    
+
+
 + Response 404
 
     Investment offer is not available (in some cases it is because the offer is already purchased by another investor)
-    
+
     + Body
 
 + Response 408
-    
+
     Request timeout
-    
+
     + Body
 
 # Group Wallet
@@ -722,7 +730,7 @@ Get user's wallet.
 + Request
 
     + Headers
-    
+
             Content-Type: application/json
             Authorization: Bearer 674e7f35-7aba-4cec-858c-f48861e9dc21
 
@@ -748,7 +756,7 @@ Available sorting and filtering fields:
 + Request
 
     + Headers
-    
+
             Content-Type: application/json
             Authorization: Bearer 674e7f35-7aba-4cec-858c-f48861e9dc21
 
@@ -774,7 +782,7 @@ Available sorting and filtering fields:
 + Request
 
     + Headers
-    
+
             Content-Type: application/json
             Authorization: Bearer 674e7f35-7aba-4cec-858c-f48861e9dc21
 
@@ -788,7 +796,7 @@ Available sorting and filtering fields:
 ## User's notifications [/users/me/notifications]
 
 Get user's notifications. Opened notifications are marked as a read.
-    
+
 ### GET
 
 Available types are:
@@ -825,7 +833,7 @@ Available types are:
 + Request
 
     + Headers
-    
+
             Content-Type: application/json
             Authorization: Bearer 674e7f35-7aba-4cec-858c-f48861e9dc21
 
@@ -833,7 +841,7 @@ Available types are:
 + Response 200
 
     + Body
-    
+
         ```json
         [
             {
@@ -909,7 +917,7 @@ Available types are:
 - datePublished: `2016-04-19T18:25:41.208+02:00` (string, required) - Date of the loan publication on marketplace
 - published: true (boolean, required) - true if the loan has been published on the marketplace, false otherwise
 - deadline: `2016-04-26T18:23:53.101+02:00` (string, required) - Deadline of the loan
-    Only loans with deadline after actual date and time are visible in the marketplace 
+    Only loans with deadline after actual date and time are visible in the marketplace
 - investmentsCount: 72 (number, required) - The count of investments attached to this loan
 - questionsCount: 3 (number, required) - The count of questions attached to this loan
 - region: 6 (string, required) - The code of the region
@@ -980,9 +988,9 @@ Available types are:
           - `ACTIVE`
           - `SOLD`
           - `CANCELLED`
-- timeCreated: `2016-04-19T18:25:41.208+02:00` (string, required) - The date when an investment was created  
-- activeTo: `2016-04-19T18:25:41.208+02:00` (string) - The date of sale on a secondary marketplace (if sold)       
-- smpFee: 0 (number) - a fee that has been taken for selling an investment on a secondary marketplace (if sold)        
+- timeCreated: `2016-04-19T18:25:41.208+02:00` (string, required) - The date when an investment was created
+- activeTo: `2016-04-19T18:25:41.208+02:00` (string) - The date of sale on a secondary marketplace (if sold)
+- smpFee: 0 (number) - a fee that has been taken for selling an investment on a secondary marketplace (if sold)
 - instalmentPostponement: true (boolean,required) - Instalments are postponed due to insurance event
 - insuranceActive: true (boolean,required) - Insurance is active
 - insuranceHistory: InsuranceHistoryItem (array[InsuranceHistoryItem], required) - All insurance intervals
@@ -1107,7 +1115,7 @@ Available types are:
 - deadline: `2016-04-19T18:25:41.208+02:00` (string, required) - purchase offer on secondary marketplace will be cancelled after this deadline
 
 ## SMPPurchaseRequest (object)
-- amount: 5000 (number, required) - the purchase amount, currently it has to be equal to the total value of investment offered for purchase 
+- amount: 5000 (number, required) - the purchase amount, currently it has to be equal to the total value of investment offered for purchase
 
 ## SMPPurchaseError (object)
 
@@ -1118,9 +1126,9 @@ Available types are:
 - description: Cannot proceed with investment on secondary marketplace due to insufficient wallet balance (string, required)
 
 ## SMPPublishingRequest (object)
-- investmentId: 15822 (number, required) - ID of an investment  
-- remainingPrincipal: 199.66 (number, required) - current remaining principal  
-- feeAmount: 21.98 (number, required) - current fee amount  
+- investmentId: 15822 (number, required) - ID of an investment
+- remainingPrincipal: 199.66 (number, required) - current remaining principal
+- feeAmount: 21.98 (number, required) - current fee amount
 
 ## SMPPublishingError (object)
 
