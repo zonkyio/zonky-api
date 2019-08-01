@@ -125,7 +125,8 @@ When client needs to connect to protected resource and hasn't valid access token
 If user is logged in and client app is not approved zonky will display consent page with some basic info about client app. If client application is already approved
 consent page is not displayed again and flow continues directly. After successful approval user is forwarded to redirect url with authorization code.
 
-Client app can use authorization code to retrieve access token by calling `oauth/token` endpoint. Authorization code can be used only once and expires after 5 min.
+Client app can use authorization code to retrieve access token by calling `oauth/token` endpoint. In some cases second factor authentication using SMS code can be required. 
+Authorization code can be used only once and expires after 5 min.
 After successful authorization client app can use access token and refresh token for calling secured api. When refresh token expires client app must initiate
 new authorization code flow to obtain access and refresh token.
 
@@ -274,7 +275,36 @@ Token authentication endpoint.
 + Response 200
 
     [Token][]
+    
++ Response 400
 
+    In this case second factor authentication is required.
+
+    + Body
+    
+        ```json
+        {
+            "error" : "invalid_grant",
+            "error_description" : "Multi-factor authentication is required",
+            "error_code" : "MFA_REQUIRED",
+            "mfa_token" : "c5f6b996-47aa-4c59-8fc7-8a03fcf5da9d"
+        }
+        ```
+
++ Request Authenticate a user using second factor (application/x-www-form-urlencoded)
+
+    + Headers
+
+            Authorization: Basic d2ViOndlYg==
+
+    + Body
+
+            username=test&password=test&grant_type=password&scope=SCOPE_APP_WEB&mfa_token=c5f6b996-47aa-4c59-8fc7-8a03fcf5da9d&sms_code=123456
+
++ Response 200
+
+    [Token][]
+    
 + Request Renew the access token with the refresh token (application/x-www-form-urlencoded)
 
     + Headers
@@ -298,9 +328,10 @@ Token authentication endpoint.
     + Body
 
             scope=SCOPE_APP_WEB&grant_type=authorization_code&code=CODE&redirect_uri=https%3A%2F%2Fgoogle.com
-+ Response 200
-    [Token][]
 
++ Response 200
+
+    [Token][]
 
 # Group Marketplace
 
