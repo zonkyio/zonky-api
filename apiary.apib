@@ -585,6 +585,7 @@ Available sorting and filtering fields:
 |```smpInvestment.status```| YES | YES `[ACTIVE]`| SMP status (if an investment has been offered on the secondary marketplace) |
 |```ext.purchasePrice```| YES | YES | Purchase price (if an investment has been bought on the secondary marketplace) |
 |```ext.activeTo```| YES | YES | The date of sale on a secondary marketplace (if sold)  |
+|```activeFrom```| YES | YES | Either purchase date if bought on SMP or activation date if bought on primary marketplace (null until the loan is fully invested and settled)  |
 
 + Response 200
 
@@ -990,6 +991,7 @@ Available types are:
           - `CANCELLED`
 - timeCreated: `2016-04-19T18:25:41.208+02:00` (string, required) - The date when an investment was created
 - activeTo: `2016-04-19T18:25:41.208+02:00` (string) - The date of sale on a secondary marketplace (if sold)
+- activeFrom: `2016-03-19T18:25:41.208+02:00` (string) - The activation date
 - smpFee: 0 (number) - a fee that has been taken for selling an investment on a secondary marketplace (if sold)
 - instalmentPostponement: true (boolean,required) - Instalments are postponed due to insurance event
 - insuranceActive: true (boolean,required) - Insurance is active
