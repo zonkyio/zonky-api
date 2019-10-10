@@ -916,6 +916,7 @@ Available types are:
     Rating is a risk category for the loan determined after scoring
 - topped (boolean, nullable) - true if loan has been topped, false otherwise
 - amount: 200000.00 (number, required) - The amount offered to and accepted by borrower
+- countryOfOrigin: `CZ` (string, required) - ISO 3166-1 alpha-2 code of the country the loan is related to
 - currency: `CZK` (string, required) - Currency code based on ISO-4217
 - remainingInvestment: 152600.00 (number, required) - The remaining amount available for investment, users without a reservation can invest only amount equal to `remainingInvestment - reservedAmount`
 - reservedAmount: 1000.00 (number, required) - The amount reserved for investors with a reservation for given loan, when not zero, users without reservations can invest only amount equal to `remainingInvestment - reservedAmount`
@@ -1116,6 +1117,7 @@ Available types are:
         - `D`
 - interestRate: 0.059900 (number, required) - Interest rate for investors
 - remainingInstalmentCount: 12 (number, required) - Number of remaining unpaid instalments
+- countryOfOrigin: `CZ` (string, required) - ISO 3166-1 alpha-2 code of the country the loan is related to
 - currency: `CZK` (string, required) - Currency code based on ISO-4217
 - originalInstalmentCount: 24 (number, required) - Number of instalments at the time when a loan was first published on primary marketplace
 - remainingPrincipal: 11500 (number, required) - Remaining principal is the unreturned part of the whole investment and at the same time it's the amount for which an investment can be purchased
