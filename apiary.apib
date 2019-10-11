@@ -592,12 +592,29 @@ Available sorting and filtering fields:
 |```ext.purchasePrice```| YES | YES | Purchase price (if an investment has been bought on the secondary marketplace) |
 |```ext.activeTo```| YES | YES | The date of sale on a secondary marketplace (if sold)  |
 |```activeFrom```| YES | YES | Either purchase date if bought on SMP or activation date if bought on primary marketplace (null until the loan is fully invested and settled)  |
+|```delinquent```| NO | NO | `true` or `false`. When this field is not present or is set to false by the client canBeOffered flag will behave based on the old rules and will be false even for investments that are now possible to be sold. This is to maintain compatibility with old clients because for delinquent investments the price is not equal to remaining principal. The price must be computed by separate request to smpSellInfo instead. |
+|```loanHealthInfo```| NO | YES | Possible values `CURRENTLY_IN_DUE`, `HISTORICALLY_IN_DUE`, `HEALTHY`. This filter can be applied only when `delinquent=true` |
+|```smpFee```| NO | YES | Possible to filter investments with fee when sold on SMP. Possible to use only `__eq=0` or `__gt=0` |
+|```onSmp```| NO | NO | Can be used to filter only investments which can be sold on SMP. Use as `onSmp=CAN_BE_OFFERED_ONLY` |
 
 + Response 200
 
     Returns user's investments
 
     + Attributes (array[Investment])
+
+## Investment secondary marketplace sell info [/users/me/investments/{id}/smpSellInfo]
+
++ Parameters
+
+    + id (integer, `1`)
+
+### Get smp sell info [GET]
+
++ Response 200 (application/json)
+
++ Attributes([SmpSellInfo][])
+
 
 ## Investor selling his investments [/users/me/traded-investments]
 
@@ -625,6 +642,12 @@ Offer an investment for sale on the secondary marketplace.
     Investment cannot be published on secondary marketplace
 
     + Attributes([SMPPublishingError][])
+
++ Response 409
+
+    In case parameters of investment sale send by the client differ from a current parameters Conflict is returned. Current parameters are available in the request body.
+
+    + Body
 
 + Response 408
 
@@ -662,14 +685,16 @@ Get the list of investments that are available for purchase on the secondary mar
 
 Available sorting and filtering fields:
 
-| Field        | Sorting           | Filtering  |
+| Field        | Sorting           | Filtering  | Note |
 | :------------- |:-------------:|:-----:|
-|```rating```| YES| YES |
-|```deadline```| YES| YES |
-|```remainingInstalmentCount```| YES| YES |
-|```remainingPrincipal```| YES| YES |
-|```purpose```| YES| YES |
-|```incomeType```| YES| YES |
+|```rating```| YES| YES | |
+|```deadline```| YES| YES | |
+|```remainingInstalmentCount```| YES| YES | |
+|```remainingPrincipal```| YES| YES | |
+|```purpose```| YES| YES | |
+|```incomeType```| YES| YES | |
+|```delinquent```| NO | NO | When not present or false only healthy loans will be returned |
+|```loanHealthInfo``` | NO | YES | |
 
 + Response 200
 
@@ -1000,9 +1025,11 @@ Available types are:
 - activeTo: `2016-04-19T18:25:41.208+02:00` (string) - The date of sale on a secondary marketplace (if sold)
 - activeFrom: `2016-03-19T18:25:41.208+02:00` (string) - The activation date
 - smpFee: 0 (number) - a fee that has been taken for selling an investment on a secondary marketplace (if sold)
+- smpFeeExpirationDate: `2016-03-19T18:25:41.208+02:00` (string) - after this date smpFee will be zero
 - instalmentPostponement: true (boolean,required) - Instalments are postponed due to insurance event
 - insuranceActive: true (boolean,required) - Insurance is active
 - insuranceHistory: InsuranceHistoryItem (array[InsuranceHistoryItem], required) - All insurance intervals
+- smpPrice: 123.45 (number) - Price for which this investment can be offered on SMP. If canBeOffered flag is true but this field is null it means that price is available only on request to smpSellInfo. Same rules apply for smpFee and smpFeeExpirationDate fields
 
 ## InsuranceHistoryItem (object)
 - policyPeriodFrom: `2016-04-18` (string, required)
@@ -1123,9 +1150,18 @@ Available types are:
 - remainingPrincipal: 11500 (number, required) - Remaining principal is the unreturned part of the whole investment and at the same time it's the amount for which an investment can be purchased
 - nextPaymentDate: `2016-04-19` (string, required) - The due date of the next instalment
 - deadline: `2016-04-19T18:25:41.208+02:00` (string, required) - purchase offer on secondary marketplace will be cancelled after this deadline
+- loanHealthInfo: `HEALTHY` (enum[string], required) - Information about payment history of the loan
+    - Members
+        - `HEALTHY`
+        - `CURRENTLY_IN_DUE`
+        - `HISTORICALLY_IN_DUE`
+- discount: 0.8 (number, required)  - Discount percents of the original price
+- price: 8768.65 (number, required) - price for which this investment can be bought
 
 ## SMPPurchaseRequest (object)
 - amount: 5000 (number, required) - the purchase amount, currently it has to be equal to the total value of investment offered for purchase
+- discount: 0.4 (number) - discount of the selling price. It must match the current discount on the BE. It prevents buying the investments for different discount that was displayed at the time GET request was made. If this field is not provided in the API only non-discounted investments can be bought.
+- remainingPrincipal: 5000 (number) - current remainingPrincipal. It serves the purpose of checking if the there was no payment made to the loan in the time from displaying the offer and making the purchase request. If this field is not provided only whole amount of investment can be bought (remaining principal on investment must match the required amount field).
 
 ## SMPPurchaseError (object)
 
@@ -1139,6 +1175,8 @@ Available types are:
 - investmentId: 15822 (number, required) - ID of an investment
 - remainingPrincipal: 199.66 (number, required) - current remaining principal
 - feeAmount: 21.98 (number, required) - current fee amount
+- price: 145.12 (number, required) - price for which this investment will be sold
+- discount: 0.32 (number) - discount
 
 ## SMPPublishingError (object)
 
@@ -1154,3 +1192,36 @@ Available types are:
         - `EXPIRED_ON_SMP`
         - `ALREADY_SOLD`
 - description: The offer has expired (string, required) - Error description
+
+
+## SmpSellInfo (object)
+
+- loanHealthStats (LoanHealthStats)
+- priceInfo (PriceInfo)
+
+## LoanHealthStats (object)
+
+- paidInstalments: 1 (number, required) - count of already paid instalments
+- longestDaysDue: 35 (number, required) - maximum of days in due with instalment payment
+- daysSinceLastInDue: 10 (number, required) - days since last delinquency
+- instalmentsCurrentlyInDue: 1 (number, required) - current number of due instalments
+- loanHealthInfo: CURRENTLY_IN_DUE (enum[string], required) - health status of the loan
+    - Members
+        - `HEALTHY` - no delinquency history
+        - `CURRENTLY_IN_DUE` - at least one current unpaid instalment
+        - `HISTORICALLY_IN_DUE` - at least one past delinquency
+- dueInstalments: 5 (number, required) - count of all instalments historically in due
+
+## PriceInfo (object)
+
+- boughtFor: 198.45 (number, required) - amount for which this investment was originally bought
+- remainingPrincipal: 145.78 (number, required) - currently unpaid amount of this investment
+- discount: 0.25 (number, required) - percentage value of investment. Value is between 0 and 1 with two decimal places
+- sellPrice: 115.98 (number, required) - price for which this investment can be sold after discount is applied
+- fee (Fee)
+
+## Fee (object)
+
+- value: 1.67 (number) - fee amount
+- expiresAt: `2020-12-19T00:00:00.000+01:00` (string) -  after this date fee value will be zero
+
