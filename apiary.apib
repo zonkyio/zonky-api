@@ -262,68 +262,11 @@ Token authentication endpoint.
         "token_type" : "bearer",
         "refresh_token" : "d33c18a7-cc94-4e35-9ac3-c67528a602f4",
         "expires_in" : 299,
-        "scope" : "SCOPE_APP_WEB"
+        "scope" : "SCOPE_APP_BASIC_INFO"
     }
     ```
 
 ### Get access token [POST]
-
-+ Request Authenticate a user with their credentials (application/x-www-form-urlencoded)
-
-    + Headers
-
-            Authorization: Basic d2ViOndlYg==
-
-    + Body
-
-            username=test&password=test&grant_type=password&scope=SCOPE_APP_WEB
-
-+ Response 200
-
-    [Token][]
-    
-+ Response 400
-
-    In this case second factor authentication is required.
-
-    + Body
-    
-        ```json
-        {
-            "error" : "invalid_grant",
-            "error_description" : "Multi-factor authentication is required",
-            "error_code" : "MFA_REQUIRED",
-            "mfa_token" : "c5f6b996-47aa-4c59-8fc7-8a03fcf5da9d"
-        }
-        ```
-
-+ Request Authenticate a user using second factor (application/x-www-form-urlencoded)
-
-    + Headers
-
-            Authorization: Basic d2ViOndlYg==
-
-    + Body
-
-            username=test&password=test&grant_type=password&scope=SCOPE_APP_WEB&mfa_token=c5f6b996-47aa-4c59-8fc7-8a03fcf5da9d&sms_code=123456
-
-+ Response 200
-
-    [Token][]
-    
-+ Request Renew the access token with the refresh token (application/x-www-form-urlencoded)
-
-    + Headers
-
-            Authorization: Basic d2ViOndlYg==
-
-    + Body
-
-            refresh_token=d33c18a7-cc94-4e35-9ac3-c67528a602f4&grant_type=refresh_token&scope=SCOPE_APP_WEB
-
-+ Response 200
-
-    [Token][]
 
 + Request Get access token with authorization code (application/x-www-form-urlencoded)
 
@@ -333,7 +276,30 @@ Token authentication endpoint.
 
     + Body
 
-            scope=SCOPE_APP_WEB&grant_type=authorization_code&code=CODE&redirect_uri=https%3A%2F%2Fgoogle.com
+            scope={scopes}&grant_type=authorization_code&code={authorization_code}&redirect_uri={redirect_uri}
+
+    + Parameters
+        + redirect_uri (string) - Same url that was used in oauth/authorize endpoint.
+        + scopes (string) - **Space** separated list of scopes.
+        + authorization_code (string) - Authorization code
+
++ Response 200
+
+    [Token][]
+
++ Request Renew the access token with the refresh token (application/x-www-form-urlencoded)
+
+    + Headers
+
+            Authorization: Basic base64 client credentials
+
+    + Body
+
+            refresh_token={refresh_token}&grant_type=refresh_token&scope={scopes}
+
+    + Parameters
+        + refresh_token (string) - Refresh token.
+        + scopes (string) - **Space** separated list of scopes.
 
 + Response 200
 
