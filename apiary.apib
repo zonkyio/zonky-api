@@ -86,20 +86,17 @@ If you find any bug in our API please use [admin@zonky.cz](mailto:admin@zonky.cz
 
 # OAuth 2 authentication
 
-Zonky users are identified using [OAuth 2.0](http://oauth.net/2/) protocol. At the moment we support following OAuth 2 grant types:
+Zonky users are identified using [OAuth 2.0](http://oauth.net/2/) protocol. At the moment we support following OAuth 2 grant type:
 
-* [Resource Owner Password Credentials Grant Flow ](https://tools.ietf.org/html/rfc6749#section-4.3) where user receives an access token and
-a refresh token in exchange for their username and password and
 * [Authorization Code Grant Flow ](https://tools.ietf.org/html/rfc6749#page-24) where client app obtains authorization code which is later
 exchanged for access token.
 
 In case you're going to create new application that is going to be used by other users, the Authorization Code Grant Flow should be used
 because that is the way how you can obtain a grant to user's account without knowing their credentials.
 
-In case you just want to play with the API you can use the Resource Owner Password Credentials Grant Flow
-using your own credentials, of course.
+In case you just want to play with the API you can use shared client described below.
 
-In case your app does not have its web service (e.g. a simple mobile app) there is no URL we could redirect the user to providing you the Authorization Code. In this case you can use the Password Credentials Grant Flow as well. The point here is that your app does not send the credentials anywhere. They are just part of the mobile app installation in the user's device.
+In case your app does not have its web service (e.g. a simple mobile app) there is no URL we could redirect the user to we can show user a  web page displaying authorization code.
 
 **Acting** on **behalf** of other **users** by supplying their **credentials** is strictly **prohibited**. Applications violating this rule will be banned with no mercy.
 
@@ -120,6 +117,39 @@ with following details
 Zonky will evaluate your request and if everything is fine we will provide unique clientId and clientSecret for you. **ClientSecret is confidential** and should not
 be shared anywhere. Client id and client secret should be used in communication only between secured servers.
 
+### Private access with shared client
+If you are running *self hosted* scripts or applications you can use universal access credentials. These credentials are *strictly forbidden* for publicly available robots.
+Authorization code will be displayed on web page and must be manually provided to user application/script.
+If you are able to provide redirect url (even running on localhost address) it would be easier for you to register your own client as zonky will send authorization code
+directly to your application.
+
+Credentials:
+
+clientId: _mujrobot_
+
+clientSecret: _mujrobot_
+
+scopes:
+* SCOPE_APP_BASIC_INFO
+* SCOPE_INVESTMENT_READ
+* SCOPE_INVESTMENT_WRITE
+* SCOPE_RESERVATIONS_READ
+* SCOPE_RESERVATIONS_WRITE
+* SCOPE_RESERVATIONS_SETTINGS_READ
+* SCOPE_RESERVATIONS_SETTINGS_WRITE
+* SCOPE_NOTIFICATIONS_READ
+* SCOPE_NOTIFICATIONS_WRITE
+
+accessToken validity: 1 day
+
+redirectUrl: https://app.zonky.cz/api/oauth/code
+
+#### Obtaining authorization code with shared client
+1. To obtain authorization code for your application you must open following url: https://app.zonky.cz/api/oauth/authorize?client_id=mujrobot&redirect_uri=https://app.zonky.cz/api/oauth/code&response_type=code&scope=SCOPE_APP_BASIC_INFO+SCOPE_INVESTMENT_READ+SCOPE_INVESTMENT_WRITE&state=opaque in your browser
+2. Login to the Zonky and approve access of client MujRobot to your Zonky account
+3. Web page with authorization code should appear in your browser
+4. You have to provide this code to your application and continue with obtaining an access token. You must hurry as the authorization code is valid only for a limited time (currently 10 minutes)
+
 ### Authorization flow
 When client needs to connect to protected resource and hasn't valid access token it should redirect user to `oauth/authorize` endpoint( find details at endpoint description).
 If user is logged in and client app is not approved zonky will display consent page with some basic info about client app. If client application is already approved
@@ -133,7 +163,7 @@ new authorization code flow to obtain access and refresh token.
 User can revoke application approval anytime and it will lead to immediate revocation of all tokens.
 
 ### Scopes
-Currently we have only one scope, that will give client application all rights to access zonky. It will likely change in future and more detailed scopes will exists.
+
 | Scope name     | Description           |
 | :------------- |:-------------         |
 | SCOPE_APP_BASIC_INFO | Allow to show only basic info about the user's account (/users/me/basic) |
@@ -304,6 +334,34 @@ Token authentication endpoint.
 + Response 200
 
     [Token][]
+
+# Group User
+Basic operations with user.
+
+## Basic Info [/users/me/basic]
+
+Get basic information about logged in user. It can be used to personalize your app or if you use zonky as SSO provider
+
+### GET
++ Request
+    + Headers
+      ```
+            Content-Type: application/json
+            Authorization: Bearer 674e7f35-7aba-4cec-858c-f48861e9dc21
+      ```
++ Response 200 (application/json)
+    + Body
+
+        ```json
+        {
+              "id" : 123,
+              "username" : "testuser@zonky.cz",
+              "email" : "testuser@zonky.cz",
+              "firstName" : "Jan",
+              "surname" : "Novák",
+              "nickName" : "testuser"
+        }
+        ```
 
 # Group Marketplace
 
@@ -692,77 +750,6 @@ Purchase a share of an investment offer on the secondary marketplace
 
     + Body
 
-# Group Wallet
-
-## User's wallet [/users/me/wallet]
-
-Get user's wallet.
-
-### GET
-
-+ Request
-
-    + Headers
-
-            Content-Type: application/json
-            Authorization: Bearer 674e7f35-7aba-4cec-858c-f48861e9dc21
-
-+ Response 200 (application/json)
-
-    + Attributes (Wallet)
-
-
-## User's transactions [/users/me/wallet/transactions]
-
-Get user's transactions.
-
-### GET
-
-Available sorting and filtering fields:
-
-| Field        | Sorting           | Filtering  |
-| :------------- |:-------------:|:-----:|
-|```transaction.transactionDate```| YES | YES |
-|```investment.loan.id```| NO | YES |
-|```investment.id```| NO | YES |
-
-+ Request
-
-    + Headers
-
-            Content-Type: application/json
-            Authorization: Bearer 674e7f35-7aba-4cec-858c-f48861e9dc21
-
-+ Response 200 (application/json)
-
-    + Attributes (array[WalletTransaction])
-
-
-## User's blocked amounts [/users/me/wallet/blocked-amounts]
-
-Get user's blocked amounts.
-
-### GET
-
-Available sorting and filtering fields:
-
-| Field        | Sorting           | Filtering  |
-| :------------- |:-------------:|:-----:|
-|```id```| YES| NO |
-|```dateStart```| YES | YES |
-|```category```| YES | YES |
-
-+ Request
-
-    + Headers
-
-            Content-Type: application/json
-            Authorization: Bearer 674e7f35-7aba-4cec-858c-f48861e9dc21
-
-+ Response 200 (application/json)
-
-    + Attributes (array[BlockedAmount])
-
 
 # Group Notifications
 
@@ -973,97 +960,6 @@ Available types are:
 ## InsuranceHistoryItem (object)
 - policyPeriodFrom: `2016-04-18` (string, required)
 - policyPeriodTo: `2016-04-19` (string, required)
-
-## Wallet (object)
-
-- id: 1 (number, required)
-- balance: 1000.00 (number, required)
-- currency: `CZK` (string, required) - Currency code based on ISO-4217
-- availableBalance: 900.00 (number, required)
-- blockedBalance: 100.00 (number, required)
-- creditSum: 20000.00 (number, required)
-- debitSum: 0.00 (number, required)
-- variableSymbol: 0123456789 (string, required)
-- account (BankAccount)
-
-## BankAccount (object)
-
-- id: 1 (number, required)
-- accountNo: 0000000123456789 (string, required)
-- accountBank: 6000 (string, required)
-- accountName: P2P JUMBO (string, required)
-
-## WalletTransaction (object)
-
-- id: 1 (number, required) - ID of a transaction
-- amount: 1000.00 (number, required) - transaction amount
-- currency: `CZK` (string, required) - Currency code based on ISO-4217
-- category: INVESTMENT (enum[string], required) - transaction category
-    - Members
-        - `DEPOSIT` - deposit to investor's wallet
-        - `WITHDRAW` - withdrawal from an investor's wallet to investor's personal bank account
-        - `INVESTMENT` - investment (transfer from investor's wallet to CREDIT account)
-        - `INVESTMENT_RETURN` - return of investment (transfer from yet unknown account to investors' wallets)
-        - `SMP_BUY` - acquisition of an investment on SMP (debit)
-        - `SMP_SELL` - selling of an investment on SMP (credit)
-        - `SMP_PRICE_TRANSFER` - transfer of investment acquisition price from CREDIT to JUMBO (credit & debit)
-        - `SMP_SALE_FEE` - fee for selling an investment (debit)
-        - `CREDIT` - investment (transfer from CREDIT account to borrower's personal bank account)
-        - `PAYMENT` - repayment (transfer from borrower's personal bank account to JUMBO account)
-        - `PAYMENT_REVERT` - revert of payment (debit transaction)
-        - `RESEND` - manual resend (transfer from CREDIT account to JUMBO account)
-        - `RETURN` - return payment or deposit to original bank account (transfer from JUMBO or CREDIT account to personal account)
-        - `CREDIT_FEE` - initial credit fee (transfer from CREDIT account to FEE account)
-        - `CREDIT_FEE_RETURN` - return of initial credit fee in case of loan withdrawal (transfer from FEE account to JUMBO account)
-        - `INVESTMENT_FEE` - fee for investments (transfer from JUMBO account to FEE account)
-        - `INVESTMENT_FEE_RETURN` - return of investment fees (transfer from FEE account to JUMBO account and to investors's wallets)
-        - `COLLECTION_FEE` - commission of collected loans (transfer to FEE account)
-        - `INTEREST` - interest paid by bank
-        - `IGNORE` - ignored transactions (category set manually to specific nonstandard transactions)
-        - `UNSPECIFIED_IN` - unspecified incoming transaction
-        - `UNSPECIFIED_OUT` - unspecified outgoing transaction
-- transactionDate: `2017-08-28T00:00:00.000+02:00` (string, nullable) - date of the transaction
-- customMessage (string, nullable) - a custom message
-- orientation: OUT (enum[string], required) - orientation of the transaction
-    - Members
-        - `IN` - incoming transaction
-        - `OUT` - outgoing transaction
-- investmentId: 1 (number, nullable) - ID of the related investment
-- loanId: 1 (number, nullable) - ID of the related loan
-- loanName: Loan refinancing (string, nullable) - name of the related loan
-- nickName: Zonky01 (string, nullable) - name of the related borrower
-
-## BlockedAmount (object)
-
-- amount: 50.00 (number, required) - transaction amount
-- currency: `CZK` (string, required) - Currency code based on ISO-4217
-- category: INVESTMENT_FEE (enum[string], required) - transaction category
-    - Members
-        - `DEPOSIT` - deposit to investor's wallet
-        - `WITHDRAW` - withdrawal from an investor's wallet to investor's personal bank account
-        - `INVESTMENT` - investment (transfer from investor's wallet to CREDIT account)
-        - `INVESTMENT_RETURN` - return of investment (transfer from yet unknown account to investors' wallets)
-        - `SMP_BUY` - acquisition of an investment on SMP (debit)
-        - `SMP_SELL` - selling of an investment on SMP (credit)
-        - `SMP_PRICE_TRANSFER` - transfer of investment acquisition price from CREDIT to JUMBO (credit & debit)
-        - `SMP_SALE_FEE` - fee for selling an investment (debit)
-        - `CREDIT` - investment (transfer from CREDIT account to borrower's personal bank account)
-        - `PAYMENT` - repayment (transfer from borrower's personal bank account to JUMBO account)
-        - `PAYMENT_REVERT` - revert of payment (debit transaction)
-        - `RESEND` - manual resend (transfer from CREDIT account to JUMBO account)
-        - `RETURN` - return payment or deposit to original bank account (transfer from JUMBO or CREDIT account to personal account)
-        - `CREDIT_FEE` - initial credit fee (transfer from CREDIT account to FEE account)
-        - `CREDIT_FEE_RETURN` - return of initial credit fee in case of loan withdrawal (transfer from FEE account to JUMBO account)
-        - `INVESTMENT_FEE` - fee for investments (transfer from JUMBO account to FEE account)
-        - `INVESTMENT_FEE_RETURN` - return of investment fees (transfer from FEE account to JUMBO account and to investors's wallets)
-        - `COLLECTION_FEE` - commission of collected loans (transfer to FEE account)
-        - `INTEREST` - interest paid by bank
-        - `IGNORE` - ignored transactions (category set manually to specific nonstandard transactions)
-        - `UNSPECIFIED_IN` - unspecified incoming transaction
-        - `UNSPECIFIED_OUT` - unspecified outgoing transaction
-- dateStart: `2017-08-28T00:00:00.000+02:00` (string, nullable) - date of the transaction
-- loanId (number, nullable) - ID of the related loan
-- loanName (string, nullable) - name of the related loan
 
 ## SMPInvestment (object)
 
