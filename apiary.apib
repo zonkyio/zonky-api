@@ -480,13 +480,6 @@ Make a new investment. Users can invest only within unreserved amount remaining 
 
 ### POST
 
-#### reCAPTCHA authorization
-
-All investments that are made withing first 120 seconds after a loan publication on the marketplace
-have to be authorized by [reCAPTCHA](https://www.google.com/recaptcha).
-
-The time before investing opens for all requests without authorization may change anytime in the future.
-
 + Request
 
     + Headers
@@ -500,7 +493,6 @@ The time before investing opens for all requests without authorization may chang
         {
               "amount" : 200,
               "loanId" : 1,
-              "captcha_response" : "..."
         }
         ```
 
@@ -511,7 +503,6 @@ The time before investing opens for all requests without authorization may chang
     The input is invalid.
 
     Possible error codes are:
-    * ```CAPTCHA_REQUIRED``` - Captcha verification is required
     * ```insufficientBalance``` - The user cannot invest because of a low wallet balance.
     * ```cancelled``` - The loan has been canceled
     * ```withdrawn``` - The loan has been withdrawn by the borrower
@@ -525,19 +516,6 @@ The time before investing opens for all requests without authorization may chang
         ```json
         {
               "error" : "reservedInvestmentOnly"
-        }
-        ```
-
-+ Response 403
-
-    Captcha verification was unsuccessful
-
-    + Body
-
-        ```json
-        {
-              "error" : "CAPTCHA_VERIFICATION_UNSUCCESSFUL",
-              "error_description" : "Captcha verification failed."
         }
         ```
 
