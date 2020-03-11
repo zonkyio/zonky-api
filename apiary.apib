@@ -777,13 +777,11 @@ Available types are:
 |```LOAN_PUBLISHED```|Loan was published.|
 |```LOAN_SEND_MONEY_BORROWER```|Loan is covered and money is being send. This was replaced by ```LOAN_COVERED```|
 |```LOAN_COVERED```|Loan was covered by investors.|
-|```LOAN_QUESTION_SAVE```|Question from chat.|
 |```LOAN_DELAY_BORROWER```|The borrower fell into delinquency.|
 |```LOAN_REPAYMENT_COMPLETED_BORROWER```|Successful repayment of the loan.|
 |```LOAN_DEADLINE_INSTALMENT```|The repayment term is approaching.|
 |```LOAN_DIFFERENT_LAST_INSTALMENT```|Different amounts of the last installment.|
 |```LOAN_PAYMENT_HALF```|Congratulations to repayment of half loan.|
-|```LOAN_ANSWER_SAVE```|The answer to your question.|
 |```LOAN_SUCCESS```|Trading of the investment.|
 |```LOAN_CANCEL```|Non-trading of investments.|
 |```LOAN_UNSIGNED```|To borrower: approved loan is still unsigned.|
@@ -884,7 +882,6 @@ Available types are:
 - deadline: `2016-04-26T18:23:53.101+02:00` (string, required) - Deadline of the loan
     Only loans with deadline after actual date and time are visible in the marketplace
 - investmentsCount: 72 (number, required) - The count of investments attached to this loan
-- questionsCount: 3 (number, required) - The count of questions attached to this loan
 - region: 6 (string, required) - The code of the region
 - mainIncomeType: EMPLOYMENT (string, required) - The type of the income that is set as primary
 - insuranceActive: true (boolean,required) - Insurance is active
