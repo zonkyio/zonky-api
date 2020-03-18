@@ -667,6 +667,7 @@ Available sorting and filtering fields:
 | Field        | Sorting           | Filtering  |
 | :------------- |:-------------:|:-----:|
 |```rating```| YES| YES |
+|```datePublished```| YES| YES |
 |```deadline```| YES| YES |
 |```remainingInstalmentCount```| YES| YES |
 |```remainingPrincipal```| YES| YES |
@@ -963,6 +964,7 @@ Available types are:
 - remainingPrincipal: 11500 (number, required) - Remaining principal is the unreturned part of the whole investment and at the same time it's the amount for which an investment can be purchased
 - nextPaymentDate: `2016-04-19` (string, required) - The due date of the next instalment
 - deadline: `2016-04-19T18:25:41.208+02:00` (string, required) - purchase offer on secondary marketplace will be cancelled after this deadline
+- datePublished: `2016-04-19T18:25:41.208+02:00` (string, required) - The date and time when this offer was published
 
 ## SMPPurchaseRequest (object)
 - amount: 5000 (number, required) - the purchase amount, currently it has to be equal to the total value of investment offered for purchase
