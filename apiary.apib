@@ -581,15 +581,15 @@ Get the list of investments that an investor has in his portfolio.
 Available sorting and filtering fields:
 
 | Field        | Sorting           | Filtering  | Description |
-| :------------- |:-------------:|:-----:|:-----:|
+| :------------- |:-----:|:-----:|:----- |
 |```id```| YES| YES | ID of an investment |
 |```timeCreated```| YES| YES | |
 |```timeModified```| YES| YES | |
 |```investor.firstName```| YES| YES | |
 |```investor.surname```| YES| YES | |
-|```status```| YES | YES `[ACTIVE|SOLD]`| Investment status |
-|```loan.status```| YES | YES `[SIGNED|COVERED|ACTIVE|PAID_OFF|PAID|STOPPED]`| Loan status |
-|```loan.unpaidLastInst```| YES| YES `[true|false]` | `true` if a loan has unpaid last instalment |
+|```status```| YES | YES | Investment status. Possible values: `[ACTIVE|SOLD]` |
+|```loan.status```| YES | YES | Loan status. Possible values: `[SIGNED|COVERED|ACTIVE|PAID_OFF|PAID|STOPPED]` |
+|```loan.unpaidLastInst```| YES| YES | `true` if a loan has unpaid last instalment. Possible values: `[true|false]` |
 |```smpInvestment.status```| YES | YES `[ACTIVE]`| SMP status (if an investment has been offered on the secondary marketplace) |
 |```ext.purchasePrice```| YES | YES | Purchase price (if an investment has been bought on the secondary marketplace) |
 |```ext.activeTo```| YES | YES | The date of sale on a secondary marketplace (if sold)  |
@@ -688,7 +688,7 @@ Get the list of investments that are available for purchase on the secondary mar
 Available sorting and filtering fields:
 
 | Field        | Sorting           | Filtering  | Note |
-| :------------- |:-------------:|:-----:|
+| :------------- |:-------------:|:-----:|:----- |
 |```rating```| YES| YES | |
 |```datePublished```| YES| YES | |
 |```deadline```| YES| YES | |
