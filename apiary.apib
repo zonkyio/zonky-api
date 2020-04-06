@@ -754,6 +754,31 @@ Purchase a share of an investment offer on the secondary marketplace
 
     + Body
 
+## Consents [/users/me/consents]
+
+### List of my consents [GET]
+
+Get the list of consents that a user has agreed on.
+
++ Request
+
+    + Headers
+
+            Content-Type: application/json
+            Authorization: Bearer 674e7f35-7aba-4cec-858c-f48861e9dc21
+
++ Response 200
+
+    + Body
+
+        ```json
+        {
+            "smpConsent": {
+                "agreedOn": "2020-01-28T21:47:33.339+01:00"
+            }
+        }
+        ```
+
 
 # Group Notifications
 
