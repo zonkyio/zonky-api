@@ -8,7 +8,7 @@ The Zonky REST API provides programmatic access to Zonky data in JSON format.
 We know that API exposed on _api.zonky.cz_ endpoint is public, but please be aware that the part of the API
 documented here is a subset of our API we ourselves consider _public_. We expect someone else may use this API and therefore we
 try to keep it backward compatible or at least let you know about upcoming changes in advance.
-We may not gurantee anything since the API is primarily used by Zonky itself, but you have our promise we will do our best to not break your work.
+We may not guarantee anything since the API is primarily used by Zonky itself, but you have our promise we will do our best to not break your work.
 
 # Rules of thumb
 
@@ -83,6 +83,11 @@ If you find any bug in our API please use [dev@zonky.cz](mailto:dev@zonky.cz). F
 
 ## 0.129.0
 * New fields in marketplace endpoints (preparation for replacing ratings with interest rates)
+
+## Further releases will appear at github release page
+**For api changes please see github release page https://github.com/zonkyio/zonky-api/releases**
+
+You can also subscribe to new releases and be informed about any future change in our api
 
 # OAuth 2 authentication
 
@@ -166,15 +171,15 @@ User can revoke application approval anytime and it will lead to immediate revoc
 
 | Scope name     | Description           |
 | :------------- |:-------------         |
-| SCOPE_APP_BASIC_INFO | Allow to show only basic info about the user's account (/users/me/basic) |
-| SCOPE_INVESTMENT_READ | Allow to show info about investments, allow to display investments export |
-| SCOPE_INVESTMENT_WRITE | Allow to invest, allow to sell and buy investments on the secondary marketplace |
-| SCOPE_RESERVATIONS_READ | Allow to view reservations |
-| SCOPE_RESERVATIONS_WRITE | Allow to accept and decline reservations |
-| SCOPE_RESERVATIONS_SETTINGS_READ | Allow to view reservation settings |
-| SCOPE_RESERVATIONS_SETTINGS_WRITE | Allow to change reservation settings |
-| SCOPE_NOTIFICATIONS_READ | Allow to view notifications and to show info about them, allow to view notifications configuration |
-| SCOPE_NOTIFICATIONS_WRITE | Allow notifications settings |
+| <a name="SCOPE_APP_BASIC_INFO">SCOPE_APP_BASIC_INFO</a> | Allow to show only basic info about the user's account (/users/me/basic) |
+| <a name="SCOPE_INVESTMENT_READ">SCOPE_INVESTMENT_READ</a>| Allow to show info about investments, allow to display investments export |
+| <a name="SCOPE_INVESTMENT_WRITE">SCOPE_INVESTMENT_WRITE</a>| Allow to invest, allow to sell and buy investments on the secondary marketplace |
+| <a name="SCOPE_RESERVATIONS_READ">SCOPE_RESERVATIONS_READ</a>| Allow to view reservations |
+| <a name="SCOPE_RESERVATIONS_WRITE">SCOPE_RESERVATIONS_WRITE</a>| Allow to accept and decline reservations |
+| <a name="SCOPE_RESERVATIONS_SETTINGS_READ">SCOPE_RESERVATIONS_SETTINGS_READ</a>| Allow to view reservation settings |
+| <a name="SCOPE_RESERVATIONS_SETTINGS_WRITE">SCOPE_RESERVATIONS_SETTINGS_WRITE</a>| Allow to change reservation settings |
+| <a name="SCOPE_NOTIFICATIONS_READ">SCOPE_NOTIFICATIONS_READ</a>| Allow to view notifications and to show info about them, allow to view notifications configuration |
+| <a name="SCOPE_NOTIFICATIONS_WRITE">SCOPE_NOTIFICATIONS_WRITE</a>| Allow notifications settings |
 
 
 # Pagination, sorting and filtering
@@ -240,14 +245,19 @@ and details in the response body:
 }
 ```
 ## Partial response
-To relieve network throughput, fields in json responses can be filtered out by providing query parameter ```fields``` with comma separated list of fields that you are interested in.
+To relieve network throughput, fields in json responses can be filtered out by providing query parameter ```fields``` with comma separated list of fields that you are interested in. Nested objects can be filtered
+with `.` notation. There is simple filter to include all fields of nested object with `.*`
 
-There are two restrictions:
-* Some fields cannot be filtered out. Typically boolean values or sume numbers. There is no list of this values
-* Only 1st level fields can be filtered. Filtering inside nested json objects is not possible.
+Examples:
 
-Example:
-Request: ```GET http://api.zonky/loans/marketplace?fields=id,url```
+- ```GET https://api.zonky.cz/loans/marketplace?fields=id,url```
+- ```GET https://api.zonky.cz/loans/marketplace?fields=id,url,borrowerRelatedInfo.*```
+- ```GET https://api.zonky.cz/loans/marketplace?fields=id,photos.url```
+- ```GET https://api.zonky.cz/loans/marketplace?fields=id,photos.*```
+
+Request:
+
+```GET https://api.zonky.cz/loans/marketplace?fields=id,url```
 
 Response:
 ```json
@@ -313,7 +323,7 @@ Token authentication endpoint.
         + scopes (string) - **Space** separated list of scopes.
         + authorization_code (string) - Authorization code
 
-+ Response 200
++ Response 200 (application/json)
 
     [Token][]
 
@@ -342,11 +352,13 @@ Basic operations with user.
 
 Get basic information about logged in user. It can be used to personalize your app or if you use zonky as SSO provider
 
+**Required scopes**
+* [SCOPE_APP_BASIC_INFO](#SCOPE_APP_BASIC_INFO)
+
 ### GET
-+ Request
++ Request (application/json)
     + Headers
       ```
-            Content-Type: application/json
             Authorization: Bearer 674e7f35-7aba-4cec-858c-f48861e9dc21
       ```
 + Response 200 (application/json)
@@ -372,6 +384,9 @@ Overview of loans on the marketplace.
 ### GET
 
 Get loans on marketplace.
+
+**Required scopes**
+* none
 
 Available sorting and filtering fields:
 
@@ -405,6 +420,9 @@ Single loan detail.
 ### GET
 
 Get loan detail.
+
+**Required scopes**
+* none
 
 + Response 200 (application/json)
 
@@ -453,6 +471,9 @@ Investments of the loan selected by ID.
 
 Get investmens for the loan. By default it returns all items. It is for backward compatibility.
 
+**Required scopes**
+* [SCOPE_INVESTMENT_READ](#SCOPE_INVESTMENT_READ)
+
 Available sorting fields:
 
 | Field        |
@@ -479,6 +500,9 @@ Available sorting fields:
 Make a new investment. Users can invest only within unreserved amount remaining to invest.
 
 ### POST
+
+**Required scopes**
+* [SCOPE_INVESTMENT_WRITE](#SCOPE_INVESTMENT_WRITE)
 
 + Request
 
@@ -531,6 +555,9 @@ Increase invested amount for an existing investment. Users can invest only withi
 
 Increase existing investment.
 
+**Required scopes**
+* [SCOPE_INVESTMENT_WRITE](#SCOPE_INVESTMENT_WRITE)
+
 + Request
 
     + Headers
@@ -578,6 +605,9 @@ Increase existing investment.
 
 Get the list of investments that an investor has in his portfolio.
 
+**Required scopes**
+* [SCOPE_INVESTMENT_READ](#SCOPE_INVESTMENT_READ)
+
 Available sorting and filtering fields:
 
 | Field        | Sorting           | Filtering  | Description |
@@ -613,6 +643,9 @@ Available sorting and filtering fields:
 
 ### Get smp sell info [GET]
 
+**Required scopes**
+* [SCOPE_INVESTMENT_READ](#SCOPE_INVESTMENT_READ)
+
 + Response 200 (application/json)
 
 + Attributes([SmpSellInfo][])
@@ -623,6 +656,9 @@ Available sorting and filtering fields:
 ### Publishing investments [POST]
 
 Offer an investment for sale on the secondary marketplace.
+
+**Required scopes**
+* [SCOPE_INVESTMENT_WRITE](#SCOPE_INVESTMENT_WRITE)
 
 + Request
 
@@ -667,6 +703,9 @@ Offer an investment for sale on the secondary marketplace.
 
 Take investment down from the secondary marketplace
 
+**Required scopes**
+* [SCOPE_INVESTMENT_WRITE](#SCOPE_INVESTMENT_WRITE)
+
 + Response 204
 
     In case investment was successfully taken down from the secondary marketplace.
@@ -685,6 +724,9 @@ Take investment down from the secondary marketplace
 
 Get the list of investments that are available for purchase on the secondary marketplace.
 
+**Required scopes**
+* none
+
 Available sorting and filtering fields:
 
 | Field        | Sorting           | Filtering  | Note |
@@ -698,6 +740,7 @@ Available sorting and filtering fields:
 |```incomeType```| YES| YES | |
 |```delinquent```| NO | NO | When not present or false only healthy loans will be returned |
 |```loanHealthInfo``` | NO | YES | |
+
 
 + Response 200
 
@@ -724,6 +767,9 @@ prepared for this situation.
 ### Purchasing investments [POST]
 
 Purchase a share of an investment offer on the secondary marketplace
+
+**Required scopes**
+* [SCOPE_INVESTMENT_WRITE](#SCOPE_INVESTMENT_WRITE)
 
 + Request
 
@@ -759,6 +805,9 @@ Purchase a share of an investment offer on the secondary marketplace
 ### List of my consents [GET]
 
 Get the list of consents that a user has agreed on.
+
+**Required scopes**
+* [SCOPE_INVESTMENT_WRITE](#SCOPE_INVESTMENT_WRITE)
 
 + Request
 
@@ -816,6 +865,9 @@ Available types are:
 |```BORROWER_HEAL```|The borrower has healed.|
 |```REQUEST_INVESTOR_WELCOME```|Investor applied.|
 |```INSTALMENT_PAID```|The instalment was paid.|
+
+**Required scopes**
+* [SCOPE_NOTIFICATIONS_READ](#SCOPE_NOTIFICATIONS_READ)
 
 + Request
 
