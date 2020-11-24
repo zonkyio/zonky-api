@@ -599,9 +599,77 @@ Increase existing investment.
 
 # Group Secondary marketplace
 
-## Getting a list of investor's investments [/users/me/investments]
 
-### List of my investments [GET]
+## Get list of my Investments [/me/investments]
+
+### Get all my investments [GET]
+
+**Required scopes**
+* [SCOPE_INVESTMENT_READ](#SCOPE_INVESTMENT_READ)
+
+List of available filter and sort attributes:
+| Field                           | Filter | Sort | Description                                                                                                                                                                                                                                  |
+| :-----------------------------  | :----: | :--: | :--                                                                                                                                                                                                                                          |
+| ```loan.name```                 |        | ✓    | _Text_                                                                                                                                                                                                                                       |
+| ```loan.purpose```              | ✓      |      | _Enum_ filter any value from loan.purpose                                                                                                                                                                                                    |
+| ```loan.interestRate```         |        | ✓    | _Number_                                                                                                                                                                                                                                     |
+| ```loan.amount```               | ✓      |      | _Number_                                                                                                                                                                                                                                     |
+| ```ext.unpaidInstalmentCount``` | ✓      | ✓    | _Number_                                                                                                                                                                                                                                     |
+| ```ext.revenueRate```           | ✓      |      | _Number_                                                                                                                                                                                                                                     |
+| ```unpaidPrincipal```           |        | ✓    | _Number_                                                                                                                                                                                                                                     |
+| ```loanHealth```                | ✓      |      | _Enum_ filter valid options are [NEVER_IN_DUE, HEALTHY_AND_ACTIVE, HISTORICALLY_IN_DUE, CURRENTLY_IN_DUE, ONE_TO_FIFTEEN_DPD, SIXTEEN_TO_THIRTY_DPD, THIRTY_ONE_TO_SIXTY_DPD, SIXTY_ONE_TO_NINETY_DPD, MORE_THAN_NINETY_DPD, PAID_OFF, PAID] |
+| ```borrowerPrimaryIncomeType``` | ✓      |      | _Enum_ filter any value from borrower.primaryIncomeType                                                                                                                                                                                      |
+| ```insuranceStatus```           | ✓      |      | _Enum_ filter valid options are [CURRENTLY_INSURED, HISTORICALLY_INSURED, NOT_INSURED]                                                                                                                                                       |
+| ```borrowerRegion```            | ✓      |      | _Enum_ filter any value from borrower.region enum is valid                                                                                                                                                                                   |
+| ```sellStatus```                | ✓      |      | _Enum_ filter any value from sellStatus enum is valid                                                                                                                                                                                        |
+| ```investmentStatus```          | ✓      |      | _Enum_ filter valid options are [ACTIVE, PAID, AWAITING_INVESTMENT]                                                                                                                                                                          |
+| ```covidLabel```                | ✓      |      | _Enum_ filter valid options are [COVID_19_REQUEST_WAITING, COVID_19_POSTPONEMENT_PROCESSED]                                                                                                                                                  |
+| ```timeCreated```               | ✓      | ✓    | _Time_                                                                                                                                                                                                                                       |
+| ```timeModified```              | ✓      | ✓    | _Time_                                                                                                                                                                                                                                       |
+| ```id```                        | ✓      | ✓    | _Number_                                                                                                                                                                                                                                     |
+
++ Response 200 (application/json)
+
+    Returns user's investments
+
+    + Attributes (array[Investmentv2],fixed-type)
+
+## My Investments Summary [/me/investments/summary]
+
+### Get summary data for my investments [GET]
+
+**Required scopes**
+* [SCOPE_INVESTMENT_READ](#SCOPE_INVESTMENT_READ)
+
+Same filter and sort criteria as for "Get all my investments" endpoint
+
++ Response 200 (application/json)
+
+    + Attributes (InvestmentSummary)
+
+## My Investment Details [/me/investments/{id}]
+
++ Parameters
+
+    + id (integer, `628265`)
+
+### Get details of an existing investment [GET]
+
+**Required scopes**
+* [SCOPE_INVESTMENT_READ](#SCOPE_INVESTMENT_READ)
+
++ Response 200 (application/json)
+
+    + Attributes(InvestmentDetail)
+
++ Response 404
+
+
+## Getting a list of investor's investments DEPRECATED [/users/me/investments]
+**DEPRECATED**
+
+### List of my investments DEPRECATED [GET]
+**DEPRECATED**
 
 Get the list of investments that an investor has in his portfolio.
 
@@ -635,13 +703,15 @@ Available sorting and filtering fields:
 
     + Attributes (array[Investment])
 
-## Investment secondary marketplace sell info [/users/me/investments/{id}/smpSellInfo]
+## Investment secondary marketplace sell info DEPRECATED [/users/me/investments/{id}/smpSellInfo]
+**DEPRECATED**
 
 + Parameters
 
     + id (integer, `1`)
 
-### Get smp sell info [GET]
+### Get smp sell info DEPRECATED [GET]
+**DEPRECATED**
 
 **Required scopes**
 * [SCOPE_INVESTMENT_READ](#SCOPE_INVESTMENT_READ)
@@ -1036,6 +1106,207 @@ Available types are:
 - insuranceActive: true (boolean,required) - Insurance is active
 - insuranceHistory: InsuranceHistoryItem (array[InsuranceHistoryItem], required) - All insurance intervals
 - smpPrice: 123.45 (number) - Price for which this investment can be offered on SMP. If canBeOffered flag is true but this field is null it means that price is available only on request to smpSellInfo. Same rules apply for smpFee and smpFeeExpirationDate fields
+
+## InvestmentSummary (object)
+
+- investmentsCount: `450` (number, required) - Number of investments
+- principalRemaining: `67038.00` (number, required) - Sum of remaining principals
+- principalPaid: `34251.02` (number, required) - Sum of paid principals
+- interestRemaining: `6768.52` (number, required) - Sum of remaining interests
+- interestPaid: `13580.28` (number, required) - Sum of paid principals
+
+## InvestmentDetail (object)
+
+- id: `628265` (number, required) - Id of investment
+- timeModified: `2020-05-25T12:13:00+01:00` (string, required) - Time when the investment changed last.
+- timeCreated: `2020-05-20T12:13:00+01:00` (string, required) - Time when the investment was created.
+- principal (object, required)
+    - total: `200.00` (number, required)
+    - unpaid: `159.87` (number, required)
+- interest (object, required)
+    - total: `4.98` (number, required)
+    - unpaid: `4.17` (number, required)
+- sellStatus: `SELLABLE_WITHOUT_FEE` (enum[string], required) - Status related to secondary marketplace
+    - Members
+        - `SELLABLE_WITH_FEE`
+        - `SELLABLE_WITHOUT_FEE`
+        - `NOT_SELLABLE`
+        - `OFFERED`
+        - `SOLD`
+- isBlockedByAB4: `true` (boolean, required) - Investment is locked by zonky and cannot be sold
+- loan (object, required)
+    - id: `56321` (number, required) - Id of loan
+    - activeLoanOrdinal: `1` (number, required) - Number of *other* active loans of the same borrower
+    - publicIdentifier: `123465798` (string,required) - Unique loan identifier
+    - contractNo: `1007376013` (string, required) - Loan contract number
+    - userNo: `1237896013` (string,required) - Immutable identifier assigned to borrower
+    - title: `Restrukturalizace úvěrů` (string, required) - Title or name of loan
+    - story: `Dlužím, kam se podívám, a chci to splatit.` (string, required) - Loan story
+    - annuity: `1400` (number, required) - annuity (monthly repayment)
+    - detailLabels: [`VERIFIED_INCOME`] (array[enum], fixed-type) - additional information about loan status
+        - Members
+            - `VERIFIED_BORROWER`
+            - `VERIFIED_INCOME`
+            - `CURRENTLY_INSURED`
+            - `ADDITIONALLY_INSURED`
+            - `BLACK_FRIDAY`
+            - `COVID_19_REQUEST_WAITING`
+            - `COVID_19_POSTPONEMENT_PROCESSED`
+    - borrower (object, required)
+        - id: `125646` (number, required) - borrower internal id
+        - borrowerNo: `123456789` (string,required) - Public unique identifier of the borrower
+        - primaryIncomeType: `EMPLOYMENT` (enum, required) - borrower primary income type
+            - Members
+                - `EMPLOYMENT`
+                - `SELF_EMPLOYMENT`
+                - `MATERNITY_LEAVE`
+                - `ENTREPRENEUR`
+                - `STUDENT`
+                - `PENSION`
+                - `LIBERAL_PROFESSION`
+                - `UNEMPLOYED`
+                - `OTHER`
+        - region: `KARLOVARSKY` (enum, required) - borrower region
+            - Members
+                - `HLAVNI_MESTO_PRAHA`
+                - `STREDOCESKY`
+                - `JIHOCESKY`
+                - `PLZENSKY`
+                - `KARLOVARSKY`
+                - `USTECKY`
+                - `LIBERECKY`
+                - `KRALOVEHRADECKY`
+                - `PARDUBICKY`
+                - `VYSOCINA`
+                - `JIHOMORAVSKY`
+                - `OLOMOUCKY`
+                - `MORAVSKOSLEZSKY`
+                - `ZLINSKY`
+    - healthStats (object, required)
+        - paidInstalments: `2` (number, required) - Number of already paid instalments
+        - longestDaysDue: `64` (number, required) - Maximum number of days after a due date of the oldest unpaid instalment in whole history of loan
+        - daysSinceLastInDue: `128` (number, required) - Number of days since last due instalment has been repaid
+        - instalmentsCurrentlyInDue: `1` (number, required) - Number of instalments that are currently in due
+        - loanHealthInfo (enum, required)
+            - Members
+                - `CURRENTLY_IN_DUE` - Last payment is not paid on time
+                - `HISTORICALLY_IN_DUE` - There is delayed payment in past but currently borrower is paying on time
+                - `HEALTHY` - There is no delayed payment during whole time
+    - purpose: `HOUSEHOLD` (enum[string], required)
+        - Members
+            - `AUTO_MOTO`
+            - `EDUCATION`
+            - `TRAVEL`
+            - `ELECTRONICS`
+            - `HEALTH`
+            - `REFINANCING`
+            - `HOUSEHOLD`
+            - `OWN_PROJECT`
+            - `OTHER`
+    - countryOfOrigin: `CZ` (enum[string], required) - ISO 3166-1 alpha-2 code of the country the loan is related to
+        - Members
+            - `CZ`
+    - currency: `CZK` (enum[string], required) - Currency code based on ISO-4217
+        - Members
+            - `CZK`
+    - payments (object, required)
+        - total: `84` (number, required) - Total number of instalments
+        - unpaid: `56` (number, required) - number of unpaid instalments
+    - revenueRate: `0.0699` (number, required) - revenue rate for investors (loan interest rate - investment fee)
+    - interestRate: `0.0749` (number, required) - Loan interest rate (old ratings can be transformed to interest rate)
+    - hasCollectionHistory: `true` (boolean, required)
+    - dpd: 1 (number, required) - number of days after a due date of the oldest unpaid instalment
+    - nextPaymentDate: `2020-05-25` (string, optional) - Due date of the next instalment
+    - label (enum[string]) - Loan status flags
+        - Members
+            - `PENDING`
+            - `IN_WITHDRAWAL`
+            - `PAST_DUE_CURRENTLY`
+            - `PAST_DUE_PREVIOUSLY`
+            - `TERMINATED`
+
+- smpSellInfo (object, required)
+    - boughtFor: `198.45` (number, required)  - Amount of money you paid for the investment
+    - remainingPrincipal: `145.78` (number, required) - Remaining amount of money you invested to the investment
+    - discount: `0.25`  (number, required) - Percentage discount from full price selling price of the investment. Value is represented as fraction from 1
+    - sellPrice: `115.98` (number, required) - Actual selling price. Fee is not included
+    - fee (object, required)
+        - value: `1.67` (number, required) - Fee amount when selling the investment
+        - expiresAt: `2020-12-19T00:00:00.000+01:00` (string, required) - Timestamp when the investment can be sold without fee (ISO-8601 format)
+
+## Investmentv2 (object)
+
+- id: 628265 (number, required) - ID of an investment
+- timeModified: `2020-05-25T12:13:00+01:00` (string, required) - Time when the investment changed last.
+- timeCreated: `2020-05-20T12:13:00+01:00` (string, required) - Time when the investment was created.
+- principal (object, required)
+    - total: `200.00` (number, required)
+    - unpaid: `159.87` (number, required)
+- interest (object, required)
+    - total: `4.98` (number, required)
+    - unpaid: `4.17` (number, required)
+- sellStatus: `SELLABLE_WITHOUT_FEE` (enum[string], required) - Status related to secondary marketplace
+    - Members
+        - `SELLABLE_WITH_FEE`
+        - `SELLABLE_WITHOUT_FEE`
+        - `NOT_SELLABLE`
+        - `OFFERED`
+        - `SOLD`
+- isBlockedByAB4: `true` (boolean, required) - Investment is locked by zonky and cannot be sold
+- loan (object, required)
+    - id: 568745 (number, required) - ID of a loan related to the investment
+    - purpose: `HOUSEHOLD` (enum[string], required)
+        - Members
+            - `AUTO_MOTO`
+            - `EDUCATION`
+            - `TRAVEL`
+            - `ELECTRONICS`
+            - `HEALTH`
+            - `REFINANCING`
+            - `HOUSEHOLD`
+            - `OWN_PROJECT`
+            - `OTHER`
+    - title: `Rekonstrukce střechy` (string, required) - Name of the loan
+    - countryOfOrigin: `CZ` (enum[string], required) - ISO 3166-1 alpha-2 code of the country the loan is related to
+        - Members
+            - `CZ`
+    - currency: `CZK` (enum[string], required) - Currency code based on ISO-4217
+        - Members
+            - `CZK`
+    - payments (object, required)
+        - total: `84` (number, required) - Total number of instalments
+        - unpaid: `56` (number, required) - number of unpaid instalments
+    - revenueRate: `0.0699` (number, required) - revenue rate for investors (loan interest rate - investment fee)
+    - interestRate: `0.0749` (number, required) - Loan interest rate (old ratings can be transformed to interest rate)
+    - hasCollectionHistory: `true` (boolean, required)
+    - dpd: 1 (number, required) - number of days after a due date of the oldest unpaid instalment
+    - nextPaymentDate: `2020-05-25` (string, optional) - Due date of the next instalment
+    - label (enum[string]) - Loan status flags
+        - Members
+            - `PENDING`
+            - `IN_WITHDRAWAL`
+            - `PAST_DUE_CURRENTLY`
+            - `PAST_DUE_PREVIOUSLY`
+            - `TERMINATED`
+    - publicIdentifier: `10123456789` (string, required) - Public loan identifier
+    - borrower (object, required)
+        - borrowerNo: `123456789` (string,required) - Public unique identifier of the borrower
+        - region: `KARLOVARSKY` (enum, required) - borrower region
+            - Members
+                - `HLAVNI_MESTO_PRAHA`
+                - `STREDOCESKY`
+                - `JIHOCESKY`
+                - `PLZENSKY`
+                - `KARLOVARSKY`
+                - `USTECKY`
+                - `LIBERECKY`
+                - `KRALOVEHRADECKY`
+                - `PARDUBICKY`
+                - `VYSOCINA`
+                - `JIHOMORAVSKY`
+                - `OLOMOUCKY`
+                - `MORAVSKOSLEZSKY`
+                - `ZLINSKY`
 
 ## InsuranceHistoryItem (object)
 - policyPeriodFrom: `2016-04-18` (string, required)
