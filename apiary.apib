@@ -205,25 +205,26 @@ For example:
 ## Filtering
 Resource records can be filtered by providing query parameters matching the following pattern: ```${fieldName}__${operationSuffix}=${filterValue}```.
 
-| Operation suffix        | Description           | Examples  |
-| :------------- |:-------------                                                                        |:-----|
-|  contains     | Retrieves object with property containing provided value (case-sensitive)             | ```?name__contains=foo``` |
-|  icontains    | Retrieves object with property containing provided value (case-insensitive)           | ```?name__icontains=foo``` |
-|  startswith   | Retrieves object with property starting with provided value (case-sensitive)          | ```?name__startswith=foo``` |
-|  istartswith  | Retrieves object with property starting with provided value (case-insensitive)        | ```?name__istartswith=foo``` |
-|  endswith      | Retrieves object with property ending with provided value (case-sensitive)            | ```?name__endswith=foo``` |
-|  iendswith     | Retrieves object with property ending with provided value (case-insensitive)          | ```?name__iendswith=foo```  |
-|  in           | Retrieves object if property is contained in provided list of values (case-sensitive) | ```?rating__in=["AAA","AA"]``` |
-|  eq           | Retrieves object if property equals to provided value (case-sensitive)                | ```?rating__eq=A``` |
-|  noteq        | Retrieves object if property not equals to provided value (case-sensitive)            | ```?rating__noteq=A``` |
-|  gt           | Retrieves object if property is greater than provided value                           | ```termInMonths__gt=24``` |
-|  gte          | Retrieves object if property is greater or equal to provided value                    | ```termInMonths__gte=24``` |
-|  gteornull    | Retrieves object if property is greater or equal to provided value or is null         | ```termInMonths__gteornull=24``` |
-|  lt           | Retrieves object if property is less than provided value                              | ```termInMonths__lt=24``` |
-|  lte          | Retrieves object if property is less or equal to provided value                       | ```termInMonths__lte=24``` |
-|  lteornull    | Retrieves object if property is less or equal to provided value or is null            | ```termInMonths__lteornull=24``` |
-|  containsall  | Retrieves object if property is collection of simple values (string, number) and contains all values in the provided list | ```listField__containsall=["value1","value2"]``` |
-|  containsany  | Retrieves object if property is collection of simple values (string, number) and contains any value from the provided list | ```listField__containsany=["value1","value2"]``` |
+| Operation suffix | Description                                                                                                                | Possible data types        | Examples                                         |
+| :-------------   | :-------------                                                                                                             | :----                      | :-----                                           |
+| contains         | Retrieves object with property containing provided value (case-sensitive)                                                  | string                     | ```?name__contains=foo```                        |
+| icontains        | Retrieves object with property containing provided value (case-insensitive)                                                | string                     | ```?name__icontains=foo```                       |
+| startswith       | Retrieves object with property starting with provided value (case-sensitive)                                               | string                     | ```?name__startswith=foo```                      |
+| istartswith      | Retrieves object with property starting with provided value (case-insensitive)                                             | string                     | ```?name__istartswith=foo```                     |
+| endswith         | Retrieves object with property ending with provided value (case-sensitive)                                                 | string                     | ```?name__endswith=foo```                        |
+| iendswith        | Retrieves object with property ending with provided value (case-insensitive)                                               | string                     | ```?name__iendswith=foo```                       |
+| in               | Retrieves object if property is contained in provided list of values (case-sensitive)                                      | enum                       | ```?rating__in=["AAA","AA"]```                   |
+| eq               | Retrieves object if property equals to provided value (case-sensitive)                                                     | enum, string, number, date | ```?rating__eq=A```                              |
+| noteq            | Retrieves object if property not equals to provided value (case-sensitive)                                                 | enum, string, number, date | ```?rating__noteq=A```                           |
+| gt               | Retrieves object if property is greater than provided value                                                                | number, date               | ```termInMonths__gt=24```                        |
+| gte              | Retrieves object if property is greater or equal to provided value                                                         | number, date               | ```termInMonths__gte=24```                       |
+| gteornull        | Retrieves object if property is greater or equal to provided value or is null                                              | number, date               | ```termInMonths__gteornull=24```                 |
+| lt               | Retrieves object if property is less than provided value                                                                   | number, date               | ```termInMonths__lt=24```                        |
+| lte              | Retrieves object if property is less or equal to provided value                                                            | number, date               | ```termInMonths__lte=24```                       |
+| lteornull        | Retrieves object if property is less or equal to provided value or is null                                                 | number, date               | ```termInMonths__lteornull=24```                 |
+| containsall      | Retrieves object if property is collection of simple values (string, number) and contains all values in the provided list  | collection                 | ```listField__containsall=["value1","value2"]``` |
+| containsany      | Retrieves object if property is collection of simple values (string, number) and contains any value from the provided list | collection                 | ```listField__containsany=["value1","value2"]``` |
+
 
 ## Data types
 When filtering with ```gt```, ```gte```, ```lt```, ```lte``` it is possible to use ISO-8601 [date](https://docs.oracle.com/javase/8/docs/api/java/time/format/DateTimeFormatter.html#ISO_DATE) or [datetime](https://docs.oracle.com/javase/8/docs/api/java/time/format/DateTimeFormatter.html#ISO_OFFSET_DATE_TIME) data type in format,
