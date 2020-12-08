@@ -410,6 +410,26 @@ Available sorting and filtering fields:
     + Attributes (array[Loan])
 
 
+## Last published loan [/loans/last-published]
+
+**Rate limit**
+
+* This endpoint has special Rate limit policy. When calling this endpoint requests are counted against its own rate limit and doesn't decrease normal rate limit.
+  This endpoint should be used for periodical polling for marketplace changes with maximum frequency 1 request per second.
+
+**Required scopes**
+* none
+
+### GET
+
+Get id of last published loan on marketplace. When id of loan is changed, you know that there is some change on marketplace. If you need information about new loans
+you have to call endpoint ```/loans/marketplace``` and use ```datePublished``` filter and sort option
+
++ Response 200 (application/json)
+
+    + Attributes (LastLoanId)
+
+
 ## Loan [/loans/{id}]
 
 Single loan detail.
@@ -824,6 +844,24 @@ Available sorting and filtering fields:
     Request timeout
 
     + Body
+
+## Get last investment published on secondary marketplace [/loans/smp-last-published]
+
+Return id and publish time of the last investment published on the secondary marketplace. You have to use other endpoints to get details of what and how many
+new investments exists. You can store `datePublished` param and later use it in filter to obtain only new investments.
+
+**Rate limit**
+
+* This endpoint has special Rate limit policy. When calling this endpoint requests are counted against its own rate limit and doesn't decrease normal rate limit.
+  This endpoint should be used for periodical polling for marketplace changes with maximum frequency 1 request per second.
+
+**Required scopes**
+* none
+
+### GET
+
++ Response 200 (application/json)
+    + Attributes (SMPLastPublished)
 
 ## SMP investment participations [/smp/investments/{id}/shares]
 
@@ -1415,3 +1453,13 @@ Available types are:
 - value: 1.67 (number) - fee amount
 - expiresAt: `2020-12-19T00:00:00.000+01:00` (string) -  after this date fee value will be zero
 
+## LastLoanId (object)
+
+- id: 123 (number, required) - id of latest loan published on marketplace
+- datePublished: `2020-12-19T00:00:00.000+01:00` (string, required) -  time when latest loan has been published
+
+## SMPLastPublished (object)
+
+
+- id: 123 (number, required) - id of latest investment published on secondary marketplace
+- datePublished: `2020-12-19T00:00:00.000+01:00` (string, required) -  time when latest investment has been published
