@@ -464,25 +464,21 @@ Investments of the loan selected by ID.
     [
       {
         "id": 123456,
-        "firstAmount": 200,
         "amount": 200,
         "timeCreated": "2017-01-10T15:10:40.831+01:00",
         "investorId": 1234,
         "loanId": 66655,
         "investorNickname": "Bob",
-        "status": "ACTIVE",
-        "additionalAmount": 0
+        "status": "ACTIVE"
       },
       {
         "id": 987654,
-        "firstAmount": 1000,
         "amount": 1000,
         "timeCreated": "2017-02-12T15:44:26.951+01:00",
         "investorId": 5678,
         "loanId": 77788,
         "investorNickname": "Tom",
-        "status": "ACTIVE",
-        "additionalAmount": 0
+        "status": "ACTIVE"
       }
     ]
 
@@ -497,16 +493,15 @@ Get investmens for the loan. By default it returns all items. It is for backward
 
 Available sorting fields:
 
-| Field        |
-| :-------------- |
-|```id```|
-|```firstAmount```|
-|```amount```|
-|```timeCreated```|
-|```investor.Id```|
-|```loan.Id```|
-|```investor.NickName```|
-|```status```|
+| Field                   |
+| :--------------         |
+| ```id```                |
+| ```amount```            |
+| ```timeCreated```       |
+| ```investor.Id```       |
+| ```loan.Id```           |
+| ```investor.NickName``` |
+| ```status```            |
 
 + Response 200
 
@@ -684,62 +679,6 @@ Same filter and sort criteria as for "Get all my investments" endpoint
     + Attributes(InvestmentDetail)
 
 + Response 404
-
-
-## Getting a list of investor's investments DEPRECATED [/users/me/investments]
-**DEPRECATED**
-
-### List of my investments DEPRECATED [GET]
-**DEPRECATED**
-
-Get the list of investments that an investor has in his portfolio.
-
-**Required scopes**
-* [SCOPE_INVESTMENT_READ](#SCOPE_INVESTMENT_READ)
-
-Available sorting and filtering fields:
-
-| Field        | Sorting           | Filtering  | Description |
-| :------------- |:-----:|:-----:|:----- |
-|```id```| YES| YES | ID of an investment |
-|```timeCreated```| YES| YES | |
-|```timeModified```| YES| YES | |
-|```investor.firstName```| YES| YES | |
-|```investor.surname```| YES| YES | |
-|```status```| YES | YES | Investment status. Possible values: `[ACTIVE|SOLD]` |
-|```loan.status```| YES | YES | Loan status. Possible values: `[SIGNED|COVERED|ACTIVE|PAID_OFF|PAID|STOPPED]` |
-|```loan.unpaidLastInst```| YES| YES | `true` if a loan has unpaid last instalment. Possible values: `[true|false]` |
-|```smpInvestment.status```| YES | YES `[ACTIVE]`| SMP status (if an investment has been offered on the secondary marketplace) |
-|```ext.purchasePrice```| YES | YES | Purchase price (if an investment has been bought on the secondary marketplace) |
-|```ext.activeTo```| YES | YES | The date of sale on a secondary marketplace (if sold)  |
-|```activeFrom```| YES | YES | Either purchase date if bought on SMP or activation date if bought on primary marketplace (null until the loan is fully invested and settled)  |
-|```delinquent```| NO | NO | `true` or `false`. When this field is not present or is set to false by the client canBeOffered flag will behave based on the old rules and will be false even for investments that are now possible to be sold. This is to maintain compatibility with old clients because for delinquent investments the price is not equal to remaining principal. The price must be computed by separate request to smpSellInfo instead. |
-|```loanHealthInfo```| NO | YES | Possible values `CURRENTLY_IN_DUE`, `HISTORICALLY_IN_DUE`, `HEALTHY`. This filter can be applied only when `delinquent=true` |
-|```smpFee```| NO | YES | Possible to filter investments with fee when sold on SMP. Possible to use only `__eq=0` or `__gt=0` |
-|```onSmp```| NO | NO | Can be used to filter only investments which can be sold on SMP. Use as `onSmp=CAN_BE_OFFERED_ONLY` |
-
-+ Response 200
-
-    Returns user's investments
-
-    + Attributes (array[Investment])
-
-## Investment secondary marketplace sell info DEPRECATED [/users/me/investments/{id}/smpSellInfo]
-**DEPRECATED**
-
-+ Parameters
-
-    + id (integer, `1`)
-
-### Get smp sell info DEPRECATED [GET]
-**DEPRECATED**
-
-**Required scopes**
-* [SCOPE_INVESTMENT_READ](#SCOPE_INVESTMENT_READ)
-
-+ Response 200 (application/json)
-
-+ Attributes([SmpSellInfo][])
 
 
 ## Investor selling his investments [/users/me/traded-investments]
@@ -1079,73 +1018,6 @@ Available types are:
 - name: 6 (string, required) - Name of the photo
 - url: /loans/31959/photos/1987 (string, required) - Relative URL to the photo
 
-## Investment (object)
-
-- id: 1 (number, required) - ID of an investment
-- loanId: 1 (number, required) - ID of a loan related to the investment
-- loanName: New car (string, required) - Loan name
-- investmentDate: `2016-04-19T18:25:41.208+02:00` (string, required) - Date of investment
-- amount: 4000 (number, required) - investment amount
-- currency: `CZK` (string, required) - Currency code based on ISO-4217
-- firstAmount: 2000 (number, required) - investment amount before eventual investment increase
-- purchasePrice: 0 (number) - purchase amount when the investment has been purchased on secondary marketplace
-- interestRate: 0.059900 (number, required) - loan interest rate
-- nickname: Zonky01 (string, required) - borrower's nickname
-- firstName: TestFirstname (string, required) - borrower's firstname
-- surname: TestSurname (string, required) - borrower's surname
-- rating: `AAA` (enum[string], required) - Rating of the loan
-      - Members
-          - `AAAAA`
-          - `AAAA`
-          - `AAA`
-          - `AA`
-          - `A`
-          - `B`
-          - `C`
-          - `D`
-- paid: 100 (number, required) - repaid principal amount
-- toPay: 100 (number, required) - principal amount that is left for repayment
-- nextPaymentDate: `2016-04-19T18:25:41.208+02:00` (string, required) - Due date of the next instalment
-- paymentStatus: `OK` (enum[string], required) - Payment status
-      - Members
-          - `OK`
-          - `DUE`
-          - `COVERED`
-          - `NOT_COVERED`
-          - `PAID_OFF`
-          - `CANCELED`
-          - `WRITTEN_OFF`
-          - `PAID`
-- dpd: 0 (number, required) - number of days after a due date of the oldest unpaid instalment
-- amountDue: 0 (number, required) - total due amount
-- loanTermInMonth: 24 (number, required) - original number of loan instalments (at the time of investment)
-- paidInterest: 134.20 (number, required) - total sum of paid interest
-- dueInterest: 0 (number, required) - total sum of due interest
-- paidPrincipal: 2560.50 (number, required) - total sum of paid principal
-- duePrincipal: 0 (number, required) - total sum of due principal
-- remainingPrincipal: 1439.50 (number, required) - total sum of remaining principal that has not been repaid yet
-- smpSoldFor: 0 (number) - the amount for which the investment has been sold on secondary marketplace (if it has been sold)
-- expectedInterest: 0 (number, required) - total amount of interest that is expected to be received from the investment
-- currentTerm: 0 (number, required) - current number of loan instalments
-- canBeOffered: true (boolean, required) - `true` if an investment can be offered for purchase on the secondary marketplace
-- onSmp: true (boolean, required) - `true` if an investment has been offered for purchase on the secondary marketplace
-- smpRelated: true (boolean, required) - `true` if an investment has been offered for purchase on the secondary marketplace at the current moment or sometimes in the past
-- remainingMonths: 0 (number, required) - number of months left to total repayment
-- status: `ACTIVE` (enum[string], required) - Investment status
-      - Members
-          - `ACTIVE`
-          - `SOLD`
-          - `CANCELLED`
-- timeCreated: `2016-04-19T18:25:41.208+02:00` (string, required) - The date when an investment was created
-- activeTo: `2016-04-19T18:25:41.208+02:00` (string) - The date of sale on a secondary marketplace (if sold)
-- activeFrom: `2016-03-19T18:25:41.208+02:00` (string) - The activation date
-- smpFee: 0 (number) - a fee that has been taken for selling an investment on a secondary marketplace (if sold)
-- smpFeeExpirationDate: `2016-03-19T18:25:41.208+02:00` (string) - after this date smpFee will be zero
-- instalmentPostponement: true (boolean,required) - Instalments are postponed due to insurance event
-- insuranceActive: true (boolean,required) - Insurance is active
-- insuranceHistory: InsuranceHistoryItem (array[InsuranceHistoryItem], required) - All insurance intervals
-- smpPrice: 123.45 (number) - Price for which this investment can be offered on SMP. If canBeOffered flag is true but this field is null it means that price is available only on request to smpSellInfo. Same rules apply for smpFee and smpFeeExpirationDate fields
-
 ## InvestmentSummary (object)
 
 - investmentsCount: `450` (number, required) - Number of investments
@@ -1421,37 +1293,6 @@ Available types are:
         - `ALREADY_SOLD`
 - description: The offer has expired (string, required) - Error description
 
-
-## SmpSellInfo (object)
-
-- loanHealthStats (LoanHealthStats)
-- priceInfo (PriceInfo)
-
-## LoanHealthStats (object)
-
-- paidInstalments: 1 (number, required) - count of already paid instalments
-- longestDaysDue: 35 (number, required) - maximum of days in due with instalment payment
-- daysSinceLastInDue: 10 (number, required) - days since last delinquency
-- instalmentsCurrentlyInDue: 1 (number, required) - current number of due instalments
-- loanHealthInfo: CURRENTLY_IN_DUE (enum[string], required) - health status of the loan
-    - Members
-        - `HEALTHY` - no delinquency history
-        - `CURRENTLY_IN_DUE` - at least one current unpaid instalment
-        - `HISTORICALLY_IN_DUE` - at least one past delinquency
-- dueInstalments: 5 (number, required) - count of all instalments historically in due
-
-## PriceInfo (object)
-
-- boughtFor: 198.45 (number, required) - amount for which this investment was originally bought
-- remainingPrincipal: 145.78 (number, required) - currently unpaid amount of this investment
-- discount: 0.25 (number, required) - percentage value of investment. Value is between 0 and 1 with two decimal places
-- sellPrice: 115.98 (number, required) - price for which this investment can be sold after discount is applied
-- fee (Fee)
-
-## Fee (object)
-
-- value: 1.67 (number) - fee amount
-- expiresAt: `2020-12-19T00:00:00.000+01:00` (string) -  after this date fee value will be zero
 
 ## LastLoanId (object)
 
