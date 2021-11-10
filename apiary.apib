@@ -84,8 +84,8 @@ If you find any bug in our API please use [dev@zonky.cz](mailto:dev@zonky.cz). F
 ## 0.129.0
 * New fields in marketplace endpoints (preparation for replacing ratings with interest rates)
 
-## Further releases will appear at github release page
-**For api changes please see github release page https://github.com/zonkyio/zonky-api/releases**
+## 0.4530.0
+* Endpoints for making investments and getting last investment removed.
 
 You can also subscribe to new releases and be informed about any future change in our api
 
@@ -509,110 +509,6 @@ Available sorting fields:
 
 
 
-# Group Investing
-
-## Investment [/marketplace/investment]
-
-Make a new investment. Users can invest only within unreserved amount remaining to invest.
-
-### POST
-
-**Required scopes**
-* [SCOPE_INVESTMENT_WRITE](#SCOPE_INVESTMENT_WRITE)
-
-+ Request
-
-    + Headers
-
-            Content-Type: application/json
-            Authorization: Bearer 674e7f35-7aba-4cec-858c-f48861e9dc21
-
-    + Body
-
-        ```json
-        {
-              "amount" : 200,
-              "loanId" : 1,
-        }
-        ```
-
-+ Response 200
-
-+ Response 400
-
-    The input is invalid.
-
-    Possible error codes are:
-    * ```insufficientBalance``` - The user cannot invest because of a low wallet balance.
-    * ```cancelled``` - The loan has been canceled
-    * ```withdrawn``` - The loan has been withdrawn by the borrower
-    * ```reservedInvestmentOnly``` - The user cannot invest without a reservation. The whole remaining investment is reserved for other users. See `remainingInvestment` and `reservedAmount`.
-    * ```overInvestment``` - The amount for investment is too high. See `remainingInvestment`.
-    * ```multipleInvestment``` - The user has already invested to this loan. Try increasing the investment instead.
-    * ```alreadyCovered``` - The whole loan amount has been already covered. See `remainingInvestment`.
-
-    + Body
-
-        ```json
-        {
-              "error" : "reservedInvestmentOnly"
-        }
-        ```
-
-## Investment increase [/marketplace/investment/{investment}]
-
-Increase invested amount for an existing investment. Users can invest only within unreserved amount remaining to invest.
-
-+ Parameters
-
-    + investment: 1 (integer) - ID of an investment
-
-### PATCH
-
-Increase existing investment.
-
-**Required scopes**
-* [SCOPE_INVESTMENT_WRITE](#SCOPE_INVESTMENT_WRITE)
-
-+ Request
-
-    + Headers
-
-            Content-Type: application/json
-            Authorization: Bearer 674e7f35-7aba-4cec-858c-f48861e9dc21
-
-    + Body
-
-        ```json
-        {
-              "amount" : 200
-        }
-        ```
-
-+ Response 200
-
-
-+ Response 400
-
-    The input is invalid.
-
-    Possible error codes are:
-    * ```insufficientBalance``` - The user cannot invest because of a low wallet balance.
-    * ```cancelled``` - The loan has been canceled
-    * ```withdrawn``` - The loan has been withdrawn by the borrower
-    * ```reservedInvestmentOnly``` - The user cannot invest without a reservation. The whole remaining investment is reserved for other users. See `remainingInvestment` and `reservedAmount`.
-    * ```overInvestment``` - The amount for investment is too high. See `remainingInvestment`.
-    * ```increaseInvestmentNotExist``` - The user has not invested to the loan yet. Try investing first.
-    * ```alreadyCovered``` - The whole loan amount has been already covered. See `remainingInvestment`.
-
-    + Body
-
-        ```json
-        {
-              "error" : "reservedInvestmentOnly"
-        }
-        ```
-
 # Group Secondary marketplace
 
 
@@ -777,70 +673,6 @@ Available sorting and filtering fields:
     Returning list of found investments on secondary marketplace
 
     + Attributes (array[SMPInvestment])
-
-+ Response 408
-
-    Request timeout
-
-    + Body
-
-## Get last investment published on secondary marketplace [/loans/smp-last-published]
-
-Return id and publish time of the last investment published on the secondary marketplace. You have to use other endpoints to get details of what and how many
-new investments exists. You can store `datePublished` param and later use it in filter to obtain only new investments.
-
-**Rate limit**
-
-* This endpoint has special Rate limit policy. When calling this endpoint requests are counted against its own rate limit and doesn't decrease normal rate limit.
-  This endpoint should be used for periodical polling for marketplace changes with maximum frequency 1 request per second.
-
-**Required scopes**
-* none
-
-### GET
-
-+ Response 200 (application/json)
-    + Attributes (SMPLastPublished)
-
-## SMP investment participations [/smp/investments/{id}/shares]
-
-At the moment it is not allowed to purchase only a part of offered investment. Investors have to buy the whole investment
-so there can be only 1 purchase per 1 offered investment. This may be eventually possible in the future and API is already
-prepared for this situation.
-
-+ Parameters
-
-    + id: 1 (integer) - ID of an investment offer
-
-### Purchasing investments [POST]
-
-Purchase a share of an investment offer on the secondary marketplace
-
-**Required scopes**
-* [SCOPE_INVESTMENT_WRITE](#SCOPE_INVESTMENT_WRITE)
-
-+ Request
-
-    + Attributes([SMPPurchaseRequest][])
-
-+ Response 204
-
-    Successful purchase
-
-    + Body
-
-+ Response 400
-
-    Cannot proceed with investment purchase
-
-    + Attributes([SMPPurchaseError][])
-
-
-+ Response 404
-
-    Investment offer is not available (in some cases it is because the offer is already purchased by another investor)
-
-    + Body
 
 + Response 408
 
