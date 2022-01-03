@@ -87,6 +87,9 @@ If you find any bug in our API please use [dev@zonky.cz](mailto:dev@zonky.cz). F
 ## 0.4530.0
 * Endpoints for making investments and getting last investment removed.
 
+## 0.4531.0
+* Endpoints for reservations were removed
+
 You can also subscribe to new releases and be informed about any future change in our api
 
 # OAuth 2 authentication
@@ -138,10 +141,6 @@ scopes:
 * SCOPE_APP_BASIC_INFO
 * SCOPE_INVESTMENT_READ
 * SCOPE_INVESTMENT_WRITE
-* SCOPE_RESERVATIONS_READ
-* SCOPE_RESERVATIONS_WRITE
-* SCOPE_RESERVATIONS_SETTINGS_READ
-* SCOPE_RESERVATIONS_SETTINGS_WRITE
 * SCOPE_NOTIFICATIONS_READ
 * SCOPE_NOTIFICATIONS_WRITE
 
@@ -174,10 +173,6 @@ User can revoke application approval anytime and it will lead to immediate revoc
 | <a name="SCOPE_APP_BASIC_INFO">SCOPE_APP_BASIC_INFO</a> | Allow to show only basic info about the user's account (/users/me/basic) |
 | <a name="SCOPE_INVESTMENT_READ">SCOPE_INVESTMENT_READ</a>| Allow to show info about investments, allow to display investments export |
 | <a name="SCOPE_INVESTMENT_WRITE">SCOPE_INVESTMENT_WRITE</a>| Allow to invest, allow to sell and buy investments on the secondary marketplace |
-| <a name="SCOPE_RESERVATIONS_READ">SCOPE_RESERVATIONS_READ</a>| Allow to view reservations |
-| <a name="SCOPE_RESERVATIONS_WRITE">SCOPE_RESERVATIONS_WRITE</a>| Allow to accept and decline reservations |
-| <a name="SCOPE_RESERVATIONS_SETTINGS_READ">SCOPE_RESERVATIONS_SETTINGS_READ</a>| Allow to view reservation settings |
-| <a name="SCOPE_RESERVATIONS_SETTINGS_WRITE">SCOPE_RESERVATIONS_SETTINGS_WRITE</a>| Allow to change reservation settings |
 | <a name="SCOPE_NOTIFICATIONS_READ">SCOPE_NOTIFICATIONS_READ</a>| Allow to view notifications and to show info about them, allow to view notifications configuration |
 | <a name="SCOPE_NOTIFICATIONS_WRITE">SCOPE_NOTIFICATIONS_WRITE</a>| Allow notifications settings |
 
@@ -831,7 +826,7 @@ Available types are:
 - countryOfOrigin: `CZ` (string, required) - ISO 3166-1 alpha-2 code of the country the loan is related to
 - currency: `CZK` (string, required) - Currency code based on ISO-4217
 - remainingInvestment: 152600.00 (number, required) - The remaining amount available for investment, users without a reservation can invest only amount equal to `remainingInvestment - reservedAmount`
-- reservedAmount: 1000.00 (number, required) - The amount reserved for investors with a reservation for given loan, when not zero, users without reservations can invest only amount equal to `remainingInvestment - reservedAmount`
+- reservedAmount: 0.00 (number, required) - `DEPRECATED`, The amount reserved for investors with a reservation for given loan, when not zero, users without reservations can invest only amount equal to `remainingInvestment - reservedAmount`
 - investmentRate: 0.237 (number, required) - Current investment rate
 - covered: false (boolean, required) - true if the loan is covered, false otherwise
 - datePublished: `2016-04-19T18:25:41.208+02:00` (string, required) - Date of the loan publication on marketplace
